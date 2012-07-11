@@ -143,7 +143,7 @@ class GameCanvasTiledLayerDemo extends GameCanvas implements Runnable {
         pl_units[1] = new PlayerUnit(3, 2, images[18], 4);
         pl_units[2] = new PlayerUnit(3, 3, images[20], 3);
         pl_units[3] = new PlayerUnit(2, 8, images[17], 5);
-        pl_units[4] = new PlayerUnit(8, 8, images[19], 5);
+        pl_units[4] = new PlayerUnit(8, 3, images[19], 5);
         for (int i = 0; i < pl_units.length; i++) {
             if (pl_units[i] != null) {
                 lManager.append(pl_units[i].getSprite());
@@ -199,8 +199,10 @@ class GameCanvasTiledLayerDemo extends GameCanvas implements Runnable {
                             if (!(j == space && i == space) && ((i <= space) && (j >= space - i) && (j <= space + i) || ((i > space) && (j >= i - space) && (j < space * 2 + 1 - i + space)))) {
                                 int a = j + col - space, b = i + row - space;
                                 if (a >= 0 && b >= 0 && backgroundLayer.getCell(a, b) < 10) {
-                                    if (getUnit(a * 24, b * 24) == null) {
-                                        movingLayer.setCell(j, i, 2);
+                                    if (getPLUnit(a * 24, b * 24) == null) {
+                                        if (getAIUnit(a * 24, b * 24) == null) {
+                                            movingLayer.setCell(j, i, 2);
+                                        }
                                     }
                                 }
 
@@ -233,7 +235,7 @@ class GameCanvasTiledLayerDemo extends GameCanvas implements Runnable {
             case 0:
                 int col = cursorSpr.getX_() / 24;
                 int row = cursorSpr.getY_() / 24;
-                Unit selectedUnit = getUnit(cursorSpr.getX_(), cursorSpr.getY_());
+                Unit selectedUnit = getPLUnit(cursorSpr.getX_(), cursorSpr.getY_());
                 if (selectedUnit != null) {
                     lManager.remove(movingLayer);
                 }
@@ -296,14 +298,25 @@ class GameCanvasTiledLayerDemo extends GameCanvas implements Runnable {
     }
 
     public Unit getUnit(int x, int y) {
-        for (int i = 0; i < ai_units.length; i++) {
-            if (ai_units[i].getX() == x && ai_units[i].getY() == y) {
-                return ai_units[i];
-            }
-        }
+
+        Unit unit = getPLUnit(x, y);
+        return (unit != null) ? unit : getAIUnit(x, y);
+    }
+
+    public Unit getPLUnit(int x, int y) {
+
         for (int i = 0; i < pl_units.length; i++) {
             if (pl_units[i].getX() == x && pl_units[i].getY() == y) {
                 return pl_units[i];
+            }
+        }
+        return null;
+    }
+
+    public Unit getAIUnit(int x, int y) {
+        for (int i = 0; i < ai_units.length; i++) {
+            if (ai_units[i].getX() == x && ai_units[i].getY() == y) {
+                return ai_units[i];
             }
         }
         return null;

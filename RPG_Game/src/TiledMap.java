@@ -46,7 +46,7 @@ class GameCanvasTiledLayerDemo extends GameCanvas implements Runnable {
     private Image[] images;
     private Cursor cursorSpr;
     private Unit[] ai_units, pl_units;
-    private TiledLayer backgroundLayer;
+    private TiledLayer backgroundLayer, movingLayer;
     private LayerManager lManager;
     private int cells[][] = {
         {4, 4, 4, 4, 4, 17, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 3, 3, 3, 3, 3, 3, 3, 3},
@@ -97,8 +97,11 @@ class GameCanvasTiledLayerDemo extends GameCanvas implements Runnable {
         cursorSpr.setPosition(cursorSpr.getX_(), cursorSpr.getY_());
         createAIUnits();
         createPLUnits();
-        lManager.append(cursorSpr);
-        lManager.append(backgroundLayer);
+//        lManager.append(cursorSpr);
+//        lManager.append(backgroundLayer);
+
+        lManager.insert(cursorSpr, 28);
+        lManager.insert(backgroundLayer, 29);
         lManager.setViewWindow(x, y, this.getWidth(), this.getHeight() - 3);
         lManager.paint(getGraphics(), 0, 0);
         flushGraphics();
@@ -140,7 +143,7 @@ class GameCanvasTiledLayerDemo extends GameCanvas implements Runnable {
         pl_units[1] = new PlayerUnit(3, 2, images[18], 4);
         pl_units[2] = new PlayerUnit(3, 3, images[20], 3);
         pl_units[3] = new PlayerUnit(2, 8, images[17], 5);
-        pl_units[4] = new PlayerUnit(3, 8, images[19], 5);
+        pl_units[4] = new PlayerUnit(8, 8, images[19], 5);
         for (int i = 0; i < pl_units.length; i++) {
             if (pl_units[i] != null) {
                 lManager.append(pl_units[i].getSprite());
@@ -190,11 +193,22 @@ class GameCanvasTiledLayerDemo extends GameCanvas implements Runnable {
                 Unit selectedUnit = getUnit(cursorSpr.getX_(), cursorSpr.getY_());
                 if (selectedUnit != null) {
                     int space = selectedUnit.getMoveSpace();
+                    movingLayer = new TiledLayer(space * 2 + 1, space * 2 + 1, images[10], 24, 24);
                     for (int i = 0; i < space * 2 + 1; i++) {
                         for (int j = 0; j < space * 2 + 1; j++) {
+                            if (!(j == space && i == space) && ((i <= space) && (j >= space - i) && (j <= space + i) || ((i > space) && (j >= i - space) && (j < space * 2 + 1 - i + space)))) {
+                                int a = j + col - space, b = i + row - space;
+                                if (a >= 0 && b >= 0 && backgroundLayer.getCell(a, b) < 10) {
+                                    if (getUnit(a * 24, b * 24) == null) {
+                                        movingLayer.setCell(j, i, 2);
+                                    }
+                                }
 
+                            }
                         }
                     }
+                    movingLayer.setPosition((col - space) * 24, (row - space) * 24);
+                    lManager.insert(movingLayer, 27);
                 }
                 break;
             default:
@@ -217,7 +231,12 @@ class GameCanvasTiledLayerDemo extends GameCanvas implements Runnable {
             case FIRE:
                 break;
             case 0:
-
+                int col = cursorSpr.getX_() / 24;
+                int row = cursorSpr.getY_() / 24;
+                Unit selectedUnit = getUnit(cursorSpr.getX_(), cursorSpr.getY_());
+                if (selectedUnit != null) {
+                    lManager.remove(movingLayer);
+                }
                 break;
             default:
                 System.out.println(gameAction + " action");

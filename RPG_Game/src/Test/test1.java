@@ -36,10 +36,10 @@ public class test1 {
         for (int i = 0; i < 9; i++) {
             for (int j = 0; j < 9; j++) {
                 if (!(j == 4 && i == 4) && ((i < 5) && (j >= 4 - i) && (j <= 4 + i) || ((i >= 5) && (j >= i - 4) && (j < 9 - i + 4)))) {
-                    System.out.print(j + "," + i + " ");
+//                    System.out.print(j + "," + i + " ");
                     //System.out.printf("%4s", "*");
                 } else {
-                    System.out.printf("%4s", " ");
+//                    System.out.printf("%4s", " ");
                 }
             }
             System.out.print("\n\n");

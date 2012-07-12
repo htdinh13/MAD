@@ -38,4 +38,20 @@ public class AIUnit implements Unit {
     public int getMoveSpace() {
         return moveSpace;
     }
+
+    public void move(int x, int y) {
+        throw new UnsupportedOperationException("Not supported yet.");
+    }
+
+    public int getPreX() {
+        throw new UnsupportedOperationException("Not supported yet.");
+    }
+
+    public int getPreY() {
+        throw new UnsupportedOperationException("Not supported yet.");
+    }
+
+    public void unmove() {
+        throw new UnsupportedOperationException("Not supported yet.");
+    }
 }

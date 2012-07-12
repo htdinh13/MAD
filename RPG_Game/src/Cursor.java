@@ -57,4 +57,9 @@ public class Cursor extends Sprite {
         }
         this.setPosition(x_, y_);
     }
+
+    public void setXY(int x, int y) {
+        this.x_ = x;
+        this.y_ = y;
+    }
 }

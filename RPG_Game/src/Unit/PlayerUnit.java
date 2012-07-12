@@ -14,7 +14,6 @@ public class PlayerUnit implements Unit {
 
     Sprite sprite;
     int x, y, moveSpace;
-    String name;
 
     public PlayerUnit(int colnum, int rownum, Image img, int moveSpace) {
         this.x = colnum * 24;

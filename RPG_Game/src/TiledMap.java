@@ -45,10 +45,11 @@ class GameCanvasTiledLayerDemo extends GameCanvas implements Runnable {
     int x, y;
     private Image[] images;
     private Cursor cursorSpr;
+    private Sprite selectedSpr;
     private Unit[] ai_units, pl_units;
     private TiledLayer backgroundLayer, movingLayer;
     private LayerManager lManager;
-    private int cells[][] = {
+    private final int cells[][] = {
         {4, 4, 4, 4, 4, 17, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 3, 3, 3, 3, 3, 3, 3, 3},
         {4, 5, 5, 5, 4, 11, 1, 1, 1, 1, 1, 1, 2, 2, 1, 1, 1, 1, 1, 3, 3, 3, 3, 3, 3},
         {4, 5, 6, 5, 4, 4, 1, 1, 7, 1, 2, 2, 2, 2, 2, 2, 2, 2, 1, 1, 1, 1, 3, 3, 3},
@@ -65,6 +66,8 @@ class GameCanvasTiledLayerDemo extends GameCanvas implements Runnable {
         {2, 2, 2, 2, 1, 1, 1, 1, 10, 10, 1, 1, 1, 1, 1, 1, 1, 1, 1, 17, 4, 6, 4, 4, 4},
         {2, 2, 2, 2, 2, 2, 1, 1, 10, 10, 1, 1, 1, 1, 1, 1, 1, 1, 1, 11, 4, 4, 4, 4, 4}
     };
+    private int movingCells[][];
+    private boolean onSelected;
 
     public void loadImages() throws IOException {
         images = new Image[21];
@@ -77,6 +80,7 @@ class GameCanvasTiledLayerDemo extends GameCanvas implements Runnable {
         super(suppressKeyEvents);
         x = 0;
         y = 0;
+        onSelected = false;
         ai_units = new Unit[23];
         pl_units = new Unit[5];
         lManager = new LayerManager();
@@ -108,29 +112,29 @@ class GameCanvasTiledLayerDemo extends GameCanvas implements Runnable {
     }
 
     public void createAIUnits() {
-        ai_units[0] = new AIUnit(10, 2, images[14]);
-        ai_units[1] = new AIUnit(10, 3, images[14]);
-        ai_units[2] = new AIUnit(11, 2, images[14]);
-        ai_units[3] = new AIUnit(11, 3, images[14]);
-        ai_units[4] = new AIUnit(11, 0, images[14]);
-        ai_units[5] = new AIUnit(11, 5, images[14]);
-        ai_units[6] = new AIUnit(12, 0, images[12]);
-        ai_units[7] = new AIUnit(12, 5, images[12]);
-        ai_units[8] = new AIUnit(13, 2, images[12]);
-        ai_units[9] = new AIUnit(13, 3, images[12]);
-        ai_units[10] = new AIUnit(15, 2, images[13]);
-        ai_units[11] = new AIUnit(15, 3, images[13]);
-        ai_units[12] = new AIUnit(16, 2, images[13]);
-        ai_units[13] = new AIUnit(16, 3, images[13]);
-        ai_units[14] = new AIUnit(20, 9, images[14]);
-        ai_units[15] = new AIUnit(21, 9, images[14]);
-        ai_units[16] = new AIUnit(22, 9, images[14]);
-        ai_units[17] = new AIUnit(20, 14, images[12]);
-        ai_units[18] = new AIUnit(21, 14, images[12]);
-        ai_units[19] = new AIUnit(22, 14, images[12]);
-        ai_units[20] = new AIUnit(21, 13, images[15]);
-        ai_units[21] = new AIUnit(20, 12, images[13]);
-        ai_units[22] = new AIUnit(22, 12, images[13]);
+        ai_units[0] = new AIUnit(10, 2, images[14], 5);
+        ai_units[1] = new AIUnit(10, 3, images[14], 5);
+        ai_units[2] = new AIUnit(11, 2, images[14], 5);
+        ai_units[3] = new AIUnit(11, 3, images[14], 5);
+        ai_units[4] = new AIUnit(11, 0, images[14], 5);
+        ai_units[5] = new AIUnit(11, 5, images[14], 5);
+        ai_units[6] = new AIUnit(12, 0, images[12], 3);
+        ai_units[7] = new AIUnit(12, 5, images[12], 3);
+        ai_units[8] = new AIUnit(13, 2, images[12], 3);
+        ai_units[9] = new AIUnit(13, 3, images[12], 3);
+        ai_units[10] = new AIUnit(15, 2, images[13], 4);
+        ai_units[11] = new AIUnit(15, 3, images[13], 4);
+        ai_units[12] = new AIUnit(16, 2, images[13], 4);
+        ai_units[13] = new AIUnit(16, 3, images[13], 4);
+        ai_units[14] = new AIUnit(20, 9, images[14], 5);
+        ai_units[15] = new AIUnit(21, 9, images[14], 5);
+        ai_units[16] = new AIUnit(22, 9, images[14], 5);
+        ai_units[17] = new AIUnit(20, 14, images[12], 3);
+        ai_units[18] = new AIUnit(21, 14, images[12], 3);
+        ai_units[19] = new AIUnit(22, 14, images[12], 3);
+        ai_units[20] = new AIUnit(21, 13, images[15], 6);
+        ai_units[21] = new AIUnit(20, 12, images[13], 4);
+        ai_units[22] = new AIUnit(22, 12, images[13], 4);
         for (int i = 0; i < ai_units.length; i++) {
             if (ai_units[i] != null) {
                 lManager.append(ai_units[i].getSprite());
@@ -164,113 +168,127 @@ class GameCanvasTiledLayerDemo extends GameCanvas implements Runnable {
         }
     }
 
-    protected void keyPressed(int keyCode) {
-        int gameAction = getGameAction(keyCode);
-        switch (gameAction) {
-            case RIGHT:
-                if (x < (600 - this.getWidth()) && cursorSpr.getX_() >= 96) {
-                    x += 24;
-                }
-                break;
-            case LEFT:
-                if (x > 0 && cursorSpr.getX_() <= 456) {
-                    x -= 24;
-                }
-                break;
-            case UP:
-                if (y > 0 && cursorSpr.getY_() <= 208) {
-                    y -= 24;
-                }
-                break;
-            case DOWN:
-                if (y < (312 - this.getWidth()) && cursorSpr.getY_() >= 120) {
-                    y += 24;
-                }
-                break;
-            case 0:
-                int col = cursorSpr.getX_() / 24;
-                int row = cursorSpr.getY_() / 24;
-                Unit selectedUnit = getUnit(cursorSpr.getX_(), cursorSpr.getY_());
-                if (selectedUnit != null) {
-                    int space = selectedUnit.getMoveSpace();
-                    movingLayer = new TiledLayer(space * 2 + 1, space * 2 + 1, images[10], 24, 24);
-                    for (int i = 0; i < space * 2 + 1; i++) {
-                        for (int j = 0; j < space * 2 + 1; j++) {
-                            if (!(j == space && i == space) && ((i <= space) && (j >= space - i) && (j <= space + i) || ((i > space) && (j >= i - space) && (j < space * 2 + 1 - i + space)))) {
-                                int a = j + col - space, b = i + row - space;
-                                if (a >= 0 && b >= 0 && backgroundLayer.getCell(a, b) < 10) {
-                                    if (getPLUnit(a * 24, b * 24) == null) {
-                                        if (getAIUnit(a * 24, b * 24) == null) {
-                                            movingLayer.setCell(j, i, 2);
-                                        }
-                                    }
-                                }
-
-                            }
+    public void createMovingLayer(Unit selectedUnit, int col, int row) {
+        int space = selectedUnit.getMoveSpace();
+        movingLayer = new TiledLayer(space * 2 + 1, space * 2 + 1, images[10], 24, 24);
+        movingCells = new int[space * 2 + 1][space * 2 + 1];
+        for (int i = 0; i < space * 2 + 1; i++) {
+            for (int j = 0; j < space * 2 + 1; j++) {
+                if (!(j == space && i == space) && ((i <= space) && (j >= space - i) && (j <= space + i) || ((i > space) && (j >= i - space) && (j < space * 2 + 1 - i + space)))) {
+                    int a = j + col - space, b = i + row - space;
+                    if (a >= 0 && b >= 0 && a < 25 && b < 15) {
+                        if (backgroundLayer.getCell(a, b) < 10) {
+//                            if (getPLUnit(a * 24, b * 24) == null) {
+//                                if (getAIUnit(a * 24, b * 24) == null) {
+                            movingLayer.setCell(j, i, 2);
+//                                }
+//                            }
                         }
                     }
-                    movingLayer.setPosition((col - space) * 24, (row - space) * 24);
-                    lManager.insert(movingLayer, 27);
+                }
+            }
+        }
+        movingLayer.setPosition((col - space) * 24, (row - space) * 24);
+        lManager.insert(movingLayer, 27);
+    }
+
+    public void createSelectedLayer() {
+    }
+
+    protected void keyPressed(int keyCode) {
+        //int gameAction = getGameAction(keyCode);
+        switch (keyCode) {
+            case KEY_NUM0:
+                if (!onSelected) {
+                    int col = cursorSpr.getX_() / 24;
+                    int row = cursorSpr.getY_() / 24;
+                    boolean isAI = false;
+
+                    Unit selectedUnit = getAIUnit(cursorSpr.getX_(), cursorSpr.getY_());
+                    if (selectedUnit != null) {
+                        isAI = true;
+                    } else {
+                        selectedUnit = getPLUnit(cursorSpr.getX_(), cursorSpr.getY_());
+                    }
+                    if (selectedUnit != null) {
+                        if (isAI) {
+                            createMovingLayer(selectedUnit, col, row);
+                        } else {
+                            createMovingLayer(selectedUnit, col, row);
+                        }
+                    }
+                }
+                break;
+            case KEY_POUND:
+                if (onSelected) {
+                    onSelected = false;
+                    lManager.remove(selectedSpr);
                 }
                 break;
             default:
                 break;
         }
-        cursorSpr.move(gameAction);
     }
-
+    
     protected void keyReleased(int keyCode) {
-        int gameAction = getGameAction(keyCode);
-        switch (gameAction) {
-            case UP:
-                break;
-            case DOWN:
-                break;
-            case LEFT:
-                break;
-            case RIGHT:
-                break;
-            case FIRE:
-                break;
-            case 0:
-                int col = cursorSpr.getX_() / 24;
-                int row = cursorSpr.getY_() / 24;
-                Unit selectedUnit = getPLUnit(cursorSpr.getX_(), cursorSpr.getY_());
-                if (selectedUnit != null) {
-                    lManager.remove(movingLayer);
+        //int gameAction = getGameAction(keyCode);
+        switch (keyCode) {
+            case KEY_NUM0:
+                if (!onSelected) {
+                    Unit selectedUnit = getUnit(cursorSpr.getX_(), cursorSpr.getY_());
+                    if (selectedUnit != null && movingLayer != null) {
+                        lManager.remove(movingLayer);
+                    }
                 }
                 break;
             default:
-                System.out.println(gameAction + " action");
                 break;
         }
     }
 
-//    public void keyPressed() {
-//        int action = getKeyStates();
-//        if ((action & RIGHT_PRESSED) != 0 && x < (600 - this.getWidth()) && cursorSpr.getX_() >= 96) {
-//            x += 24;
-//        }
-//        if ((action & LEFT_PRESSED) != 0 && x > 0 && cursorSpr.getX_() <= 456) {
-//            x -= 24;
-//        }
-//        if ((action & UP_PRESSED) != 0 && y > 0 && cursorSpr.getY_() <= 208) {
-//            y -= 24;
-//        }
-//        if ((action & DOWN_PRESSED) != 0 && y < (312 - this.getWidth()) && cursorSpr.getY_() >= 120) {
-//            y += 24;
-//        }
-//        if ((action & KEY_NUM0) != 0) {
-//            int col = cursorSpr.getX_() / 24;
-//            int row = cursorSpr.getY_() / 24;
-//            Unit selectedUnit = getUnit(cursorSpr.getX_(), cursorSpr.getY_());
-//            if (selectedUnit != null) {
-//                int space = selectedUnit.getMoveSpace();
-//                System.out.println("Unit");
-//            }
-//        }
-//        cursorSpr.move(action);
-//    }
+    public void keyPressed() {
+        int action = getKeyStates();
+        if ((action & RIGHT_PRESSED) != 0) {
+            if (onSelected) {
+                selectedSpr.nextFrame();
+            } else if (x < (600 - this.getWidth()) && cursorSpr.getX_() >= 96) {
+                x += 24;
+            }
+        } else if ((action & LEFT_PRESSED) != 0) {
+            if (onSelected) {
+                selectedSpr.prevFrame();
+            } else if (x > 0 && cursorSpr.getX_() <= 456) {
+                x -= 24;
+            }
+        } else if ((action & UP_PRESSED) != 0) {
+            if (onSelected) {
+                //moving option
+            } else if (y > 0 && cursorSpr.getY_() <= 208) {
+                y -= 24;
+            }
+        } else if ((action & DOWN_PRESSED) != 0) {
+            if (onSelected) {
+                //moving option
+            } else if (y < (312 - this.getWidth()) && cursorSpr.getY_() >= 120) {
+                y += 24;
+            }
+        } else if ((action & FIRE_PRESSED) != 0) {
+            if (!onSelected) {
+                onSelected = true;
+                selectedSpr = new Sprite(images[0], 30, 14);
+                selectedSpr.setPosition(cursorSpr.getX_() - 3, cursorSpr.getY_() - 14);
+                lManager.insert(selectedSpr, 26);
+            } else {
+                
+                System.out.println(selectedSpr.getFrame());
+            }
+        }
+        if (!onSelected) {
+            cursorSpr.move(action);
+        }
+
+    }
+
     public void drawLayer() {
 
         Graphics g = this.getGraphics();
@@ -288,10 +306,10 @@ class GameCanvasTiledLayerDemo extends GameCanvas implements Runnable {
         while (true) {
             cursorSpr.nextFrame();
             animationUnits();
-            //keyPressed();
+            keyPressed();
             drawLayer();
             try {
-                Thread.sleep(200);
+                Thread.sleep(175);
             } catch (InterruptedException ex) {
             }
         }

@@ -11,11 +11,12 @@ import javax.microedition.lcdui.game.Sprite;
 public class AIUnit implements Unit {
 
     Sprite sprite;
-    int x, y;
+    int x, y, moveSpace;
 
-    public AIUnit(int colnum, int rownum, Image img) {
+    public AIUnit(int colnum, int rownum, Image img,int moveSpace) {
         this.x = colnum * 24;
         this.y = rownum * 24;
+        this.moveSpace = moveSpace;
 
         sprite = new Sprite(img, 24, 24);
         sprite.setVisible(true);
@@ -35,6 +36,6 @@ public class AIUnit implements Unit {
     }
 
     public int getMoveSpace() {
-        return 0;
+        return moveSpace;
     }
 }

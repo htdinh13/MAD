@@ -18,4 +18,9 @@ public class CavalryAttack extends AttackAbstract {
         super(img, width, height);
     }
 
+    public CavalryAttack(Image img) {
+        super(img);
+    }
+
+    
 }

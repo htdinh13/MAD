@@ -16,6 +16,11 @@ public abstract class AttackAbstract implements Attackable, Runnable {
         attackSpr = new Sprite(img, width, height);
     }
 
+    public AttackAbstract(Image img) {
+        attackSpr = new Sprite(img, 30, 30);
+
+    }
+
     public Sprite getAttackSpr() {
         return attackSpr;
     }
@@ -27,6 +32,7 @@ public abstract class AttackAbstract implements Attackable, Runnable {
 
     public void run() {
         attackSpr.setFrame(0);
+
         for (int i = 0; i < attackSpr.getFrame(); i++) {
             attackSpr.nextFrame();
             try {

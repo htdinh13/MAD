@@ -18,10 +18,13 @@ public class RangedAttack extends AttackAbstract {
         super(img, width, height);
     }
 
+    public RangedAttack(Image img) {
+        super(img);
+    }
+
     public void attack(Unit attacker, Unit attacked) {
     }
 
     public void run() {
-
     }
 }

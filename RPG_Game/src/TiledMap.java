@@ -104,7 +104,6 @@ class GameCanvasTiledLayerDemo extends GameCanvas implements Runnable {
             ex.printStackTrace();
         }
 
-
         backgroundLayer = new TiledLayer(25, 15, images[2], 24, 24);
 
         for (int i = 0; i < 15; i++) {
@@ -116,9 +115,14 @@ class GameCanvasTiledLayerDemo extends GameCanvas implements Runnable {
         cursorSpr.setVisible(true);
         cursorSpr.setPosition(cursorSpr.getX_(), cursorSpr.getY_());
 
+        //Create attackable
+        Attackable attack = new KnightAttack(images[4]);
+        lManager.insert(attack.getAttackSpr(), 0);
+        attack.start();
+        //end attackable
 
-        createAIUnits();
         createPLUnits();
+        createAIUnits();
 
         lManager.insert(cursorSpr, 1);
         lManager.insert(backgroundLayer, lManager.getSize());
@@ -128,29 +132,29 @@ class GameCanvasTiledLayerDemo extends GameCanvas implements Runnable {
     }
 
     public void createAIUnits() {
-        ai_units[0] = new AIUnit(10, 2, images[14], 5, new CavalryAttack(images[5], 30, 30));
-        ai_units[1] = new AIUnit(10, 3, images[14], 5, new CavalryAttack(images[5], 30, 30));
-        ai_units[2] = new AIUnit(11, 2, images[14], 5, new CavalryAttack(images[5], 30, 30));
-        ai_units[3] = new AIUnit(11, 3, images[14], 5, new CavalryAttack(images[5], 30, 30));
-        ai_units[4] = new AIUnit(11, 0, images[14], 5, new CavalryAttack(images[5], 30, 30));
-        ai_units[5] = new AIUnit(11, 5, images[14], 5, new CavalryAttack(images[5], 30, 30));
-        ai_units[6] = new AIUnit(12, 0, images[12], 3, new RangedAttack(images[6], 30, 30));
-        ai_units[7] = new AIUnit(12, 5, images[12], 3, new RangedAttack(images[6], 30, 30));
-        ai_units[8] = new AIUnit(13, 2, images[12], 3, new RangedAttack(images[6], 30, 30));
-        ai_units[9] = new AIUnit(13, 3, images[12], 3, new RangedAttack(images[6], 30, 30));
-        ai_units[10] = new AIUnit(15, 2, images[13], 4, new KnightAttack(images[4], 30, 30));
-        ai_units[11] = new AIUnit(15, 3, images[13], 4, new KnightAttack(images[4], 30, 30));
-        ai_units[12] = new AIUnit(16, 2, images[13], 4, new KnightAttack(images[4], 30, 30));
-        ai_units[13] = new AIUnit(16, 3, images[13], 4, new KnightAttack(images[4], 30, 30));
-        ai_units[14] = new AIUnit(20, 9, images[14], 5, new CavalryAttack(images[5], 30, 30));
-        ai_units[15] = new AIUnit(21, 9, images[14], 5, new CavalryAttack(images[5], 30, 30));
-        ai_units[16] = new AIUnit(22, 9, images[14], 5, new CavalryAttack(images[5], 30, 30));
-        ai_units[17] = new AIUnit(20, 14, images[12], 3, new RangedAttack(images[6], 30, 30));
-        ai_units[18] = new AIUnit(21, 14, images[12], 3, new RangedAttack(images[6], 30, 30));
-        ai_units[19] = new AIUnit(22, 14, images[12], 3, new RangedAttack(images[6], 30, 30));
-        ai_units[20] = new AIUnit(21, 13, images[15], 6, new CavalryAttack(images[5], 30, 30));
-        ai_units[21] = new AIUnit(20, 12, images[13], 4, new KnightAttack(images[4], 30, 30));
-        ai_units[22] = new AIUnit(22, 12, images[13], 4, new KnightAttack(images[4], 30, 30));
+        ai_units[0] = new AIUnit(10, 2, images[14], 5, new CavalryAttack(images[5]));
+        ai_units[1] = new AIUnit(10, 3, images[14], 5, new CavalryAttack(images[5]));
+        ai_units[2] = new AIUnit(11, 2, images[14], 5, new CavalryAttack(images[5]));
+        ai_units[3] = new AIUnit(11, 3, images[14], 5, new CavalryAttack(images[5]));
+        ai_units[4] = new AIUnit(11, 0, images[14], 5, new CavalryAttack(images[5]));
+        ai_units[5] = new AIUnit(11, 5, images[14], 5, new CavalryAttack(images[5]));
+        ai_units[6] = new AIUnit(12, 0, images[12], 3, new RangedAttack(images[6]));
+        ai_units[7] = new AIUnit(12, 5, images[12], 3, new RangedAttack(images[6]));
+        ai_units[8] = new AIUnit(13, 2, images[12], 3, new RangedAttack(images[6]));
+        ai_units[9] = new AIUnit(13, 3, images[12], 3, new RangedAttack(images[6]));
+        ai_units[10] = new AIUnit(15, 2, images[13], 4, new KnightAttack(images[4]));
+        ai_units[11] = new AIUnit(15, 3, images[13], 4, new KnightAttack(images[4]));
+        ai_units[12] = new AIUnit(16, 2, images[13], 4, new KnightAttack(images[4]));
+        ai_units[13] = new AIUnit(16, 3, images[13], 4, new KnightAttack(images[4]));
+        ai_units[14] = new AIUnit(20, 9, images[14], 5, new CavalryAttack(images[5]));
+        ai_units[15] = new AIUnit(21, 9, images[14], 5, new CavalryAttack(images[5]));
+        ai_units[16] = new AIUnit(22, 9, images[14], 5, new CavalryAttack(images[5]));
+        ai_units[17] = new AIUnit(20, 14, images[12], 3, new RangedAttack(images[6]));
+        ai_units[18] = new AIUnit(21, 14, images[12], 3, new RangedAttack(images[6]));
+        ai_units[19] = new AIUnit(22, 14, images[12], 3, new RangedAttack(images[6]));
+        ai_units[20] = new AIUnit(21, 13, images[15], 6, new CavalryAttack(images[5]));
+        ai_units[21] = new AIUnit(20, 12, images[13], 4, new KnightAttack(images[4]));
+        ai_units[22] = new AIUnit(22, 12, images[13], 4, new KnightAttack(images[4]));
         for (int i = 0; i < ai_units.length; i++) {
             if (ai_units[i] != null) {
                 lManager.append(ai_units[i].getSprite());
@@ -159,11 +163,11 @@ class GameCanvasTiledLayerDemo extends GameCanvas implements Runnable {
     }
 
     public void createPLUnits() {
-        pl_units[0] = new PlayerUnit(2, 2, images[16], 5, new CavalryAttack(images[5], 30, 30));
-        pl_units[1] = new PlayerUnit(3, 2, images[18], 4, new KnightAttack(images[4], 30, 30));
-        pl_units[2] = new PlayerUnit(3, 3, images[20], 3, new RangedAttack(images[6], 30, 30));
-        pl_units[3] = new PlayerUnit(2, 10, images[17], 5, new CavalryAttack(images[5], 30, 30));
-        pl_units[4] = new PlayerUnit(22, 3, images[19], 5, new CavalryAttack(images[5], 30, 30));
+        pl_units[0] = new PlayerUnit(2, 2, images[16], 5, new CavalryAttack(images[5]));
+        pl_units[1] = new PlayerUnit(3, 2, images[18], 4, new KnightAttack(images[4]));
+        pl_units[2] = new PlayerUnit(3, 3, images[20], 3, new RangedAttack(images[6]));
+        pl_units[3] = new PlayerUnit(2, 10, images[17], 5, new CavalryAttack(images[5]));
+        pl_units[4] = new PlayerUnit(22, 3, images[19], 5, new CavalryAttack(images[5]));
         for (int i = 0; i < pl_units.length; i++) {
             if (pl_units[i] != null) {
                 lManager.append(pl_units[i].getSprite());
@@ -258,7 +262,7 @@ class GameCanvasTiledLayerDemo extends GameCanvas implements Runnable {
             }
         }
         attackingLayer.setPosition((col - space) * 24, (row - space) * 24);
-        lManager.insert(attackingLayer, 4);
+        lManager.insert(attackingLayer, 2);
     }
 
     protected void keyPressed(int keyCode) {
@@ -483,6 +487,7 @@ class GameCanvasTiledLayerDemo extends GameCanvas implements Runnable {
                         Unit attacked = getAIUnit(cursorSpr.getX_(), cursorSpr.getY_());
                         if (attacked != null) {
                             selectedUnit.getAttackType().attack(selectedUnit, attacked);
+                            selectedUnit.getAttackType().start();
                             unitEndTurned();
                         }
                     }
@@ -521,6 +526,8 @@ class GameCanvasTiledLayerDemo extends GameCanvas implements Runnable {
                             Unit attacked = getAIUnit(cursorSpr.getX_(), cursorSpr.getY_());
                             if (attacked != null) {
                                 selectedUnit.getAttackType().attack(selectedUnit, attacked);
+                                lManager.insert(selectedUnit.getAttackType().getAttackSpr(), 0);
+                                selectedUnit.getAttackType().start();
                                 unitEndTurned();
                             }
                         }

@@ -2,6 +2,7 @@ package Unit;
 
 import java.io.IOException;
 import javax.microedition.lcdui.Image;
+import javax.microedition.lcdui.game.LayerManager;
 import javax.microedition.lcdui.game.Sprite;
 
 /**
@@ -10,10 +11,11 @@ import javax.microedition.lcdui.game.Sprite;
  */
 public class AIUnit implements Unit {
 
-    Sprite sprite;
-    int x, y, moveSpace;
+    private Sprite sprite, endSprite;
+    private int x, y, moveSpace;
+    private boolean endTurn;
 
-    public AIUnit(int colnum, int rownum, Image img,int moveSpace) {
+    public AIUnit(int colnum, int rownum, Image img, int moveSpace) {
         this.x = colnum * 24;
         this.y = rownum * 24;
         this.moveSpace = moveSpace;
@@ -21,6 +23,7 @@ public class AIUnit implements Unit {
         sprite = new Sprite(img, 24, 24);
         sprite.setVisible(true);
         sprite.setPosition(x, y);
+        endTurn = false;
     }
 
     public Sprite getSprite() {
@@ -53,5 +56,20 @@ public class AIUnit implements Unit {
 
     public void unmove() {
         throw new UnsupportedOperationException("Not supported yet.");
+    }
+
+    public void endTurn(LayerManager lManager, Image image) {
+        endSprite = new Sprite(image);
+        endSprite.setVisible(true);
+        endSprite.setPosition(x, y);
+        lManager.append(endSprite);
+    }
+
+    public boolean getEndTurn() {
+        return endTurn;
+    }
+
+    public void setEndTurn() {
+        endTurn = !endTurn;
     }
 }

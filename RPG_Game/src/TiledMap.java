@@ -45,7 +45,7 @@ class GameCanvasTiledLayerDemo extends GameCanvas implements Runnable {
     int x, y;
     private Image[] images;
     private Cursor cursorSpr;
-    private Sprite selectedSpr;
+    private Sprite selectedSpr, movedSpr;
     private Unit[] ai_units, pl_units;
     private TiledLayer backgroundLayer, movingLayer;
     private LayerManager lManager;
@@ -92,6 +92,18 @@ class GameCanvasTiledLayerDemo extends GameCanvas implements Runnable {
         } catch (IOException ex) {
             ex.printStackTrace();
         }
+
+        //create attack sprite
+
+        AttackSprite a1 = new AttackSprite(images[6], 30, 30);
+        a1.setVisible(true);
+        a1.setPosition(9 * 24+15, 2 * 24);
+
+        Thread t = new Thread(a1);
+        t.start();
+
+
+        // End attack sprite
         backgroundLayer = new TiledLayer(25, 15, images[2], 24, 24);
 
         for (int i = 0; i < 15; i++) {
@@ -102,13 +114,14 @@ class GameCanvasTiledLayerDemo extends GameCanvas implements Runnable {
         cursorSpr = new Cursor(images[7], 24, 24, this.getWidth() / 2 - 24, (this.getHeight() - 3) / 2 - 24);
         cursorSpr.setVisible(true);
         cursorSpr.setPosition(cursorSpr.getX_(), cursorSpr.getY_());
+        
+        
         createAIUnits();
         createPLUnits();
-//        lManager.append(cursorSpr);
-//        lManager.append(backgroundLayer);
 
-        lManager.insert(cursorSpr, 25);
-        lManager.insert(backgroundLayer, 29);
+        lManager.insert(cursorSpr, 1);
+        lManager.insert(a1, 0);
+        lManager.insert(backgroundLayer, lManager.getSize());
         lManager.setViewWindow(x, y, this.getWidth(), this.getHeight() - 3);
         lManager.paint(getGraphics(), 0, 0);
         flushGraphics();
@@ -195,7 +208,6 @@ class GameCanvasTiledLayerDemo extends GameCanvas implements Runnable {
     }
 
     public void createAttackLayer(Unit selectedUnit, int col, int row) {
-        
     }
 
     protected void keyPressed(int keyCode) {
@@ -213,7 +225,7 @@ class GameCanvasTiledLayerDemo extends GameCanvas implements Runnable {
                     } else {
                         selectedUnit = getPLUnit(cursorSpr.getX_(), cursorSpr.getY_());
                     }
-                    if (selectedUnit != null) {
+                    if (selectedUnit != null && !selectedUnit.getEndTurn()) {
                         if (isAI) {
                             createMovingLayer(selectedUnit, col, row);
                         } else {
@@ -229,8 +241,10 @@ class GameCanvasTiledLayerDemo extends GameCanvas implements Runnable {
                         if (isMoved) {
                             isMoved = false;
                             selectedUnit.unmove();
+                            lManager.remove(movedSpr);
                             selectedSpr.setVisible(true);
                             movingLayer.setVisible(true);
+                            cursorSpr.setXY(selectedUnit.getX(), selectedUnit.getY());
                             cursorSpr.setPosition(selectedUnit.getX(), selectedUnit.getY());
                         } else {
                             isMoving = false;
@@ -257,7 +271,6 @@ class GameCanvasTiledLayerDemo extends GameCanvas implements Runnable {
         switch (keyCode) {
             case KEY_NUM0:
                 if (!onSelected) {
-                    Unit selectedUnit = getUnit(cursorSpr.getX_(), cursorSpr.getY_());
                     if (selectedUnit != null && movingLayer != null) {
                         lManager.remove(movingLayer);
                     }
@@ -273,7 +286,11 @@ class GameCanvasTiledLayerDemo extends GameCanvas implements Runnable {
         if ((action & RIGHT_PRESSED) != 0) {
             if (onSelected) {
                 if (isMoving) {
-                    cursorSpr.move(action);
+                    if (isMoved) {
+                        movedSpr.nextFrame();
+                    } else {
+                        cursorSpr.move(action);
+                    }
                 } else {
                     selectedSpr.nextFrame();
                 }
@@ -283,7 +300,11 @@ class GameCanvasTiledLayerDemo extends GameCanvas implements Runnable {
         } else if ((action & LEFT_PRESSED) != 0) {
             if (onSelected) {
                 if (isMoving) {
-                    cursorSpr.move(action);
+                    if (isMoved) {
+                        movedSpr.nextFrame();
+                    } else {
+                        cursorSpr.move(action);
+                    }
                 } else {
                     selectedSpr.nextFrame();
                 }
@@ -292,7 +313,7 @@ class GameCanvasTiledLayerDemo extends GameCanvas implements Runnable {
             }
         } else if ((action & UP_PRESSED) != 0) {
             if (onSelected) {
-                if (isMoving) {
+                if (isMoving && !isMoved) {
                     cursorSpr.move(action);
                 }
             } else if (y > 0 && cursorSpr.getY_() <= 208) {
@@ -300,50 +321,96 @@ class GameCanvasTiledLayerDemo extends GameCanvas implements Runnable {
             }
         } else if ((action & DOWN_PRESSED) != 0) {
             if (onSelected) {
-                if (isMoving) {
+                if (isMoving && !isMoved) {
                     cursorSpr.move(action);
                 }
             } else if (y < (312 - this.getWidth()) && cursorSpr.getY_() >= 120) {
                 y += 24;
             }
         } else if ((action & FIRE_PRESSED) != 0) {
-
             if (!onSelected) {
-                onSelected = true;
-                selectedSpr = new Sprite(images[0], 30, 14);
-                selectedSpr.setPosition(cursorSpr.getX_() - 3, cursorSpr.getY_() - 14);
-                lManager.insert(selectedSpr, 0);
+                selectedUnit = getPLUnit(cursorSpr.getX_(), cursorSpr.getY_());
+                if (selectedUnit != null && !selectedUnit.getEndTurn()) {
+                    onSelected = true;
+                    selectedSpr = new Sprite(images[0], 30, 14);
+                    selectedSpr.setPosition(cursorSpr.getX_() - 3, cursorSpr.getY_() - 14);
+                    lManager.insert(selectedSpr, 2);
+                }
             } else {
                 if (!isMoving) {
                     switch (selectedSpr.getFrame()) {
                         case 0:
                             int col = cursorSpr.getX_() / 24;
                             int row = cursorSpr.getY_() / 24;
-                            selectedUnit = getPLUnit(cursorSpr.getX_(), cursorSpr.getY_());
                             if (selectedUnit != null) {
                                 createMovingLayer(selectedUnit, col, row);
                                 isMoving = true;
                             }
                             break;
+                        case 1:
+                            selectedSpr.setVisible(false);
+                            selectedUnit = getPLUnit(cursorSpr.getX_(), cursorSpr.getY_());
+                            selectedUnit.endTurn(lManager, images[3]);
+                            if (movedSpr != null) {
+                                lManager.remove(movedSpr);
+                            }
+                            if (selectedSpr != null) {
+                                lManager.remove(selectedSpr);
+                            }
+                            if (movingLayer != null) {
+                                lManager.remove(movingLayer);
+                            }
+                            isMoved = false;
+                            isMoving = false;
+                            onSelected = false;
+                            break;
+                        case 2:
+                            System.out.println("Attack");
+                            break;
                         default:
                             break;
                     }
                 } else {
-                    selectedUnit.move(cursorSpr.getX(), cursorSpr.getY());
-//                    lManager.remove(selectedSpr);
-//                    lManager.remove(movingLayer);
-                    selectedSpr.setVisible(false);
-                    movingLayer.setVisible(false);
-                    isMoved = true;
-                    //show attack or wait sprite
-                    //remember to implement undo moved
+                    if (!isMoved) {
+                        selectedUnit.move(cursorSpr.getX(), cursorSpr.getY());
+                        selectedSpr.setVisible(false);
+                        movingLayer.setVisible(false);
+                        isMoved = true;
+                        movedSpr = new Sprite(images[11], 22, 14);
+                        movedSpr.setFrame(1);
+                        movedSpr.setPosition(cursorSpr.getX_() + 1, cursorSpr.getY_() - 14);
+                        lManager.insert(movedSpr, 3);
+                    } else {
+                        switch (movedSpr.getFrame()) {
+                            case 0:
+                                System.out.println("ATTACK");
+                                break;
+                            case 1:
+                                selectedSpr.setVisible(false);
+                                selectedUnit = getPLUnit(cursorSpr.getX_(), cursorSpr.getY_());
+                                selectedUnit.endTurn(lManager, images[3]);
+                                if (movedSpr != null) {
+                                    lManager.remove(movedSpr);
+                                }
+                                if (selectedSpr != null) {
+                                    lManager.remove(selectedSpr);
+                                }
+                                if (movingLayer != null) {
+                                    lManager.remove(movingLayer);
+                                }
+                                isMoved = false;
+                                isMoving = false;
+                                onSelected = false;
+                            default:
+                                break;
+                        }
+                    }
                 }
             }
         }
         if (!onSelected) {
             cursorSpr.move(action);
         }
-
     }
 
     public void drawLayer() {

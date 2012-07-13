@@ -1,5 +1,7 @@
 package Unit;
 
+import javax.microedition.lcdui.Image;
+import javax.microedition.lcdui.game.LayerManager;
 import javax.microedition.lcdui.game.Sprite;
 
 /**
@@ -21,6 +23,12 @@ public interface Unit {
     public int getMoveSpace();
 
     public void move(int x, int y);
-    
+
     public void unmove();
+
+    public void endTurn(LayerManager lManager, Image image);
+
+    public boolean getEndTurn();
+
+    public void setEndTurn();
 }

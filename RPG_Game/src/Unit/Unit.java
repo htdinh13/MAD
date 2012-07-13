@@ -1,5 +1,6 @@
 package Unit;
 
+import Attack.Attackable;
 import javax.microedition.lcdui.Image;
 import javax.microedition.lcdui.game.LayerManager;
 import javax.microedition.lcdui.game.Sprite;
@@ -16,19 +17,15 @@ public interface Unit {
 
     public int getY();
 
-    public int getPreX();
-
-    public int getPreY();
-
     public int getMoveSpace();
 
     public void move(int x, int y);
-
-    public void unmove();
 
     public void endTurn(LayerManager lManager, Image image);
 
     public boolean getEndTurn();
 
-    public void setEndTurn();
+    public void setEndTurn(boolean endTurn);
+
+    public Attackable getAttackType();
 }

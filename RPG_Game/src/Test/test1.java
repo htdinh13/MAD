@@ -1,48 +1,45 @@
 package Test;
 
-
 /**
  *
  * @author HOANG TRUONG DINH
  */
 public class test1 {
 
+    public static Integer[] attackCells;
+
     public static void main(String[] args) {
-//        for (int i = 0; i < 9; i++) {
-//            int n = 0;
-//            if (i < 5) {
-//                n = i;
-//            } else if (i >= 5) {
-//                n = 8 - i;
-//            }
-//            for (int j = 0; j < 4 - n; j++) {
-//                System.out.printf("%4s", " ");
-//            }
-//            for (int j = 0; j < n + 1; j++) {
-//                if (!(j == 4 && i == 4)) {
-//                    System.out.print(j+4+","+i+" ");
-//                } else {
-//                    System.out.printf("%4s", " ");
-//                }
-//            }
-//            for (int j = 1; j < n + 1; j++) {
-//                    System.out.print(j+4+","+i+" ");
-//            }
-//            for (int j = 1; j < 4 - n; j++) {
-//                System.out.printf("%4s", " ");
-//            }
-//            System.out.print("\n\n");
-//        }
-        for (int i = 0; i < 9; i++) {
-            for (int j = 0; j < 9; j++) {
-                if (!(j == 4 && i == 4) && ((i < 5) && (j >= 4 - i) && (j <= 4 + i) || ((i >= 5) && (j >= i - 4) && (j < 9 - i + 4)))) {
-//                    System.out.print(j + "," + i + " ");
-                    //System.out.printf("%4s", "*");
-                } else {
-//                    System.out.printf("%4s", " ");
-                }
-            }
-            System.out.print("\n\n");
+        attackCells = new Integer[10];
+        attackCells[0] = new Integer(0);
+        attackCells[1] = new Integer(1);
+        attackCells[2] = new Integer(2);
+        attackCells[3] = new Integer(3);
+
+        System.out.println(nextAttackCell(8).intValue());
+        System.out.println(prevAttackCell(8).intValue());
+    }
+
+    public static Integer nextAttackCell(int index) {
+        if (attackCells[0] == null) {
+            return null;
         }
+        if (index == attackCells.length - 1) {
+            return attackCells[0];
+        } else {
+            index++;
+        }
+        return (attackCells[index++] != null) ? attackCells[index] : nextAttackCell(index);
+    }
+
+    public static Integer prevAttackCell(int index) {
+        if (attackCells[0] == null) {
+            return null;
+        }
+        if (index == 0) {
+            index = attackCells.length - 1;
+        } else {
+            index--;
+        }
+        return (attackCells[index] != null) ? attackCells[index] : prevAttackCell(index);
     }
 }

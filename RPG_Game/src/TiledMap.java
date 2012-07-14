@@ -164,10 +164,10 @@ class GameCanvasTiledLayerDemo extends GameCanvas implements Runnable {
 
     public void createPLUnits() {
         pl_units[0] = new PlayerUnit(2, 2, images[16], 5, new CavalryAttack(images[5], lManager));
-        pl_units[1] = new PlayerUnit(3, 2, images[18], 4, new KnightAttack(images[4], lManager));
-        pl_units[2] = new PlayerUnit(3, 3, images[20], 3, new RangedAttack(images[6], lManager));
-        pl_units[3] = new PlayerUnit(2, 10, images[17], 5, new CavalryAttack(images[5], lManager));
-        pl_units[4] = new PlayerUnit(22, 3, images[19], 5, new CavalryAttack(images[5], lManager));
+        pl_units[1] = new PlayerUnit(3, 3, images[18], 4, new KnightAttack(images[4], lManager));
+        pl_units[2] = new PlayerUnit(3, 9, images[20], 3, new RangedAttack(images[6], lManager));
+        pl_units[3] = new PlayerUnit(2, 8, images[17], 5, new CavalryAttack(images[5], lManager));
+        pl_units[4] = new PlayerUnit(3, 8, images[19], 5, new CavalryAttack(images[5], lManager));
         for (int i = 0; i < pl_units.length; i++) {
             if (pl_units[i] != null) {
                 lManager.append(pl_units[i].getSprite());

@@ -11,10 +11,11 @@ import javax.microedition.lcdui.game.Sprite;
  */
 public abstract class UnitAbstract implements Unit {
 
-    private Sprite sprite, endSprite;
+    private Sprite sprite, endSprite, deadSprite;
     private int x, y, moveSpace;
     private boolean endTurn;
     private Attackable attackType;
+    private LayerManager lManager;
 
     public UnitAbstract(int colnum, int rownum, Image img, int moveSpace, Attackable attackType) {
         this.x = colnum * 24;
@@ -63,7 +64,7 @@ public abstract class UnitAbstract implements Unit {
         endSprite = new Sprite(image);
         endSprite.setVisible(true);
         endSprite.setPosition(x, y);
-        lManager.insert(endSprite, 0);
+        lManager.insert(endSprite, 4);
         endTurn = true;
     }
 

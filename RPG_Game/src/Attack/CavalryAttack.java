@@ -7,6 +7,7 @@ package Attack;
 import Attack.AttackAbstract;
 import Unit.Unit;
 import javax.microedition.lcdui.Image;
+import javax.microedition.lcdui.game.LayerManager;
 
 /**
  *
@@ -18,8 +19,8 @@ public class CavalryAttack extends AttackAbstract {
         super(img, width, height);
     }
 
-    public CavalryAttack(Image img) {
-        super(img);
+    public CavalryAttack(Image img, LayerManager lManager) {
+        super(img,lManager);
     }
 
     

@@ -5,6 +5,7 @@
 package Attack;
 
 import Unit.Unit;
+import javax.microedition.lcdui.game.LayerManager;
 import javax.microedition.lcdui.game.Sprite;
 
 /**
@@ -18,4 +19,8 @@ public interface Attackable {
     public void start();
 
     public Sprite getAttackSpr();
+    
+    public void setAttackSpr(Sprite sprite);
+    
+    public LayerManager getLManager();
 }

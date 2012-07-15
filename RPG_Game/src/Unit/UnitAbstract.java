@@ -15,7 +15,7 @@ public abstract class UnitAbstract implements Unit {
     private int x, y, moveSpace;
     private boolean endTurn;
     private Attackable attackType;
-    private LayerManager lManager;
+    // private LayerManager lManager;
 
     public UnitAbstract(int colnum, int rownum, Image img, int moveSpace, Attackable attackType) {
         this.x = colnum * 24;
@@ -68,6 +68,11 @@ public abstract class UnitAbstract implements Unit {
         endTurn = true;
     }
 
+    public void newTurn(LayerManager lManager) {
+        endTurn = false;
+        lManager.remove(endSprite);
+    }
+
     public void move(int x, int y) {
         this.x = x;
         this.y = y;
@@ -76,5 +81,32 @@ public abstract class UnitAbstract implements Unit {
 
     public Attackable getAttackType() {
         return attackType;
+    }
+
+    public void isDead(final LayerManager lManager, Image image) {
+        deadSprite = new Sprite(image, 15, 20);
+        deadSprite.setVisible(true);
+        if (y == 0) {
+            deadSprite.setPosition(x + 4, y + 24);
+        } else {
+            deadSprite.setPosition(x + 4, y - 20);
+        }
+        lManager.insert(deadSprite, 4);
+        Thread t = new Thread(new Runnable() {
+
+            public void run() {
+                for (int i = 0; i < 8; i++) {
+                    deadSprite.nextFrame();
+                    try {
+                        Thread.sleep(200);
+                    } catch (InterruptedException ex) {
+                        ex.printStackTrace();
+                    }
+                }
+                lManager.remove(deadSprite);
+                lManager.remove(sprite);
+            }
+        });
+        t.start();
     }
 }

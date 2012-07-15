@@ -19,6 +19,7 @@ public class RangedAttack extends AttackAbstract {
 
     private int direction, startFrame;
     private int currX, currY, destX, destY;
+   // private Unit attacked, attacker;
 
     public RangedAttack(Image img, int width, int height) {
         super(img, width, height);
@@ -29,6 +30,8 @@ public class RangedAttack extends AttackAbstract {
     }
 
     public void attack(Unit attacker, Unit attacked) {
+//        this.attacked = attacked;
+//        this.attacker = attacker;
         if (attacker.getX() == attacked.getX()) {
             direction = (attacker.getY() > attacked.getY()) ? 0 : 1;
             startFrame = 7;
@@ -36,8 +39,6 @@ public class RangedAttack extends AttackAbstract {
             direction = (attacker.getX() > attacked.getX()) ? 2 : 3;
             startFrame = 0;
         }
-
-
         super.getAttackSpr().setFrame(startFrame);
         super.getAttackSpr().setVisible(true);
         switch (direction) {
@@ -71,15 +72,12 @@ public class RangedAttack extends AttackAbstract {
                 break;
 
         }
-        System.out.println("Current (X,Y)" + currX + "," + currY);
-        System.out.println("Destina (X,Y)" + destX + "," + destY);
         super.getAttackSpr().setPosition(currX, currY);
         super.getLManager().insert(super.getAttackSpr(), 0);
     }
 
     public void run() {
         super.getAttackSpr().setFrame(startFrame);
-
         while (!((currX == destX) && (currY == destY))) {
             switch (direction) {
                 case 0:
@@ -106,6 +104,7 @@ public class RangedAttack extends AttackAbstract {
             } catch (InterruptedException ex) {
                 ex.printStackTrace();
             }
+            
         }
         for (int i = 0; i < super.getAttackSpr().getFrameSequenceLength() / 2 - 2; i++) {
             super.getAttackSpr().nextFrame();
@@ -115,6 +114,6 @@ public class RangedAttack extends AttackAbstract {
                 ex.printStackTrace();
             }
         }
-        super.getLManager().remove(super.getAttackSpr());
+        super.getLManager().remove(super.getAttackSpr());        
     }
 }

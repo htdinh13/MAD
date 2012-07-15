@@ -23,6 +23,10 @@ public interface Unit {
 
     public void endTurn(LayerManager lManager, Image image);
 
+    public void newTurn(LayerManager lManager);
+
+    public void isDead(LayerManager lManager, Image image);
+
     public boolean getEndTurn();
 
     public void setEndTurn(boolean endTurn);

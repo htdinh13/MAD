@@ -22,23 +22,23 @@ import javax.microedition.midlet.MIDlet;
 import javax.microedition.midlet.MIDletStateChangeException;
 
 public class TiledMap extends MIDlet implements CommandListener {
-
+    
     private Display mDisplay;
-
+    
     protected void destroyApp(boolean unconditional) throws MIDletStateChangeException {
     }
-
+    
     protected void pauseApp() {
     }
-
+    
     protected void startApp() throws MIDletStateChangeException {
         mDisplay = Display.getDisplay(this);
         GameCanvasTiledLayerDemo cv = new GameCanvasTiledLayerDemo(false);
         mDisplay.setCurrent(cv);
         cv.start();
-
+        
     }
-
+    
     public void commandAction(Command c, Displayable d) {
         throw new UnsupportedOperationException("Not supported yet.");
     }
@@ -49,7 +49,7 @@ public class TiledMap extends MIDlet implements CommandListener {
  * @author HOANG TRUONG DINH
  */
 class GameCanvasTiledLayerDemo extends GameCanvas implements Runnable {
-
+    
     private int x, y, index;
     private Image[] images;
     private Cursor cursorSpr;
@@ -77,14 +77,14 @@ class GameCanvasTiledLayerDemo extends GameCanvas implements Runnable {
     private Cell attackCells[];
     private boolean onSelected, isMoved, isMoving, isAI, isAttacking;
     private Unit selectedUnit;
-
+    
     public void loadImages() throws IOException {
         images = new Image[21];
         for (int i = 0; i < 21; i++) {
             images[i] = Image.createImage("/Images/" + i + ".png");
         }
     }
-
+    
     public GameCanvasTiledLayerDemo(boolean suppressKeyEvents) {
         super(suppressKeyEvents);
         x = 0;
@@ -103,9 +103,9 @@ class GameCanvasTiledLayerDemo extends GameCanvas implements Runnable {
         } catch (IOException ex) {
             ex.printStackTrace();
         }
-
+        
         backgroundLayer = new TiledLayer(25, 15, images[2], 24, 24);
-
+        
         for (int i = 0; i < 15; i++) {
             for (int j = 0; j < 25; j++) {
                 backgroundLayer.setCell(j, i, cells[i][j]);
@@ -123,14 +123,15 @@ class GameCanvasTiledLayerDemo extends GameCanvas implements Runnable {
 
         createPLUnits();
         createAIUnits();
-
+        //ai_units[4].isDead(lManager,images[8]);
+        
         lManager.insert(cursorSpr, 1);
         lManager.insert(backgroundLayer, lManager.getSize());
         lManager.setViewWindow(x, y, this.getWidth(), this.getHeight() - 3);
         lManager.paint(getGraphics(), 0, 0);
         flushGraphics();
     }
-
+    
     public void createAIUnits() {
         ai_units[0] = new AIUnit(10, 2, images[14], 5, new CavalryAttack(images[5], lManager));
         ai_units[1] = new AIUnit(10, 3, images[14], 5, new CavalryAttack(images[5], lManager));
@@ -161,7 +162,7 @@ class GameCanvasTiledLayerDemo extends GameCanvas implements Runnable {
             }
         }
     }
-
+    
     public void createPLUnits() {
         pl_units[0] = new PlayerUnit(2, 2, images[16], 5, new CavalryAttack(images[5], lManager));
         pl_units[1] = new PlayerUnit(3, 3, images[18], 4, new KnightAttack(images[4], lManager));
@@ -174,7 +175,7 @@ class GameCanvasTiledLayerDemo extends GameCanvas implements Runnable {
             }
         }
     }
-
+    
     public void animationUnits() {
         for (int i = 0; i < ai_units.length; i++) {
             if (ai_units[i] != null) {
@@ -187,7 +188,7 @@ class GameCanvasTiledLayerDemo extends GameCanvas implements Runnable {
             }
         }
     }
-
+    
     public void createMovingLayer(Unit selectedUnit) {
         int col = selectedUnit.getX() / 24;
         int row = selectedUnit.getY() / 24;
@@ -212,7 +213,7 @@ class GameCanvasTiledLayerDemo extends GameCanvas implements Runnable {
         movingLayer.setPosition((col - space) * 24, (row - space) * 24);
         lManager.insert(movingLayer, 28);
     }
-
+    
     public void createAttackingLayer(Unit selectedUnit) {
         int col = cursorSpr.getX_() / 24;
         int row = cursorSpr.getY_() / 24;
@@ -264,14 +265,14 @@ class GameCanvasTiledLayerDemo extends GameCanvas implements Runnable {
         attackingLayer.setPosition((col - space) * 24, (row - space) * 24);
         lManager.insert(attackingLayer, 2);
     }
-
+    
     protected void keyPressed(int keyCode) {
         //int gameAction = getGameAction(keyCode);
         switch (keyCode) {
             // Use '0' for show the movement range
             case KEY_NUM0:
                 if (!onSelected) {
-
+                    
                     selectedUnit = getAIUnit(cursorSpr.getX_(), cursorSpr.getY_());
                     if (selectedUnit != null) {
                         isAI = true;
@@ -328,12 +329,12 @@ class GameCanvasTiledLayerDemo extends GameCanvas implements Runnable {
                 break;
             case KEY_STAR:
                 break;
-
+            
             default:
                 break;
         }
     }
-
+    
     protected void keyReleased(int keyCode) {
         //int gameAction = getGameAction(keyCode);
         switch (keyCode) {
@@ -348,7 +349,7 @@ class GameCanvasTiledLayerDemo extends GameCanvas implements Runnable {
                 break;
         }
     }
-
+    
     public void keyPressed() {
         int action = getKeyStates();
         if ((action & RIGHT_PRESSED) != 0) {
@@ -428,7 +429,7 @@ class GameCanvasTiledLayerDemo extends GameCanvas implements Runnable {
             } else {
                 moveActiveView(action);
             }
-
+            
         } else if ((action & DOWN_PRESSED) != 0) {
             if (onSelected) {
                 if (isMoving && !isMoved && !isAttacking) {
@@ -442,9 +443,9 @@ class GameCanvasTiledLayerDemo extends GameCanvas implements Runnable {
                     }
                 }
             } else {
-
+                
                 moveActiveView(action);
-
+                
             }
         } else if ((action & FIRE_PRESSED) != 0) {
             if (!onSelected) {
@@ -488,6 +489,8 @@ class GameCanvasTiledLayerDemo extends GameCanvas implements Runnable {
                         if (attacked != null) {
                             selectedUnit.getAttackType().attack(selectedUnit, attacked);
                             selectedUnit.getAttackType().start();
+                            // Attack
+                            attacked.isDead(lManager, images[8]);
                             unitEndTurned();
                         }
                     }
@@ -528,6 +531,9 @@ class GameCanvasTiledLayerDemo extends GameCanvas implements Runnable {
                                 selectedUnit.getAttackType().attack(selectedUnit, attacked);
                                 //lManager.insert(selectedUnit.getAttackType().getAttackSpr(), 0);
                                 selectedUnit.getAttackType().start();
+                                
+                                //Attacking
+                                attacked.isDead(lManager, images[8]);
                                 unitEndTurned();
                             }
                         }
@@ -539,7 +545,7 @@ class GameCanvasTiledLayerDemo extends GameCanvas implements Runnable {
             cursorSpr.move(action);
         }
     }
-
+    
     public void unitEndTurned() {
         //selectedSpr.setVisible(false);
         //selectedUnit = getPLUnit(cursorSpr.getX_(), cursorSpr.getY_());
@@ -562,7 +568,7 @@ class GameCanvasTiledLayerDemo extends GameCanvas implements Runnable {
         onSelected = false;
         isAttacking = false;
     }
-
+    
     public int nextAttackCell(int index) {
         if (attackCells[0] == null) {
             return -1;
@@ -573,7 +579,7 @@ class GameCanvasTiledLayerDemo extends GameCanvas implements Runnable {
             return (attackCells[++index] != null) ? index : nextAttackCell(index);
         }
     }
-
+    
     public int prevAttackCell(int index) {
         if (attackCells[0] == null) {
             return -1;
@@ -585,12 +591,12 @@ class GameCanvasTiledLayerDemo extends GameCanvas implements Runnable {
             return (attackCells[--index] != null) ? index : prevAttackCell(index);
         }
     }
-
+    
     public void setActiveView(int x, int y) {
         this.x = (x < 96) ? 0 : (x > 456) ? 456 - 96 : x - 96;
         this.y = (y < 120) ? 0 : (y > 192) ? 192 - 120 : y - 120;
     }
-
+    
     public void moveActiveView(int action) {
         if ((action & RIGHT_PRESSED) != 0) {
             if (x < (600 - this.getWidth()) && cursorSpr.getX_() >= 96) {
@@ -610,20 +616,20 @@ class GameCanvasTiledLayerDemo extends GameCanvas implements Runnable {
             }
         }
     }
-
+    
     public void drawLayer() {
-
+        
         Graphics g = this.getGraphics();
         lManager.setViewWindow(x, y, this.getWidth(), this.getHeight() - 3);
         lManager.paint(g, 0, 0);
         flushGraphics();
     }
-
+    
     public void start() {
         Thread t = new Thread(this);
         t.start();
     }
-
+    
     public void run() {
         while (true) {
             cursorSpr.nextFrame();
@@ -636,15 +642,15 @@ class GameCanvasTiledLayerDemo extends GameCanvas implements Runnable {
             }
         }
     }
-
+    
     public Unit getUnit(int x, int y) {
-
+        
         Unit unit = getPLUnit(x, y);
         return (unit != null) ? unit : getAIUnit(x, y);
     }
-
+    
     public Unit getPLUnit(int x, int y) {
-
+        
         for (int i = 0; i < pl_units.length; i++) {
             if (pl_units[i].getX() == x && pl_units[i].getY() == y) {
                 return pl_units[i];
@@ -652,7 +658,7 @@ class GameCanvasTiledLayerDemo extends GameCanvas implements Runnable {
         }
         return null;
     }
-
+    
     public Unit getAIUnit(int x, int y) {
         for (int i = 0; i < ai_units.length; i++) {
             if (ai_units[i].getX() == x && ai_units[i].getY() == y) {

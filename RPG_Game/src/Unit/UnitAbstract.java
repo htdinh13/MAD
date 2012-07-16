@@ -91,20 +91,23 @@ public abstract class UnitAbstract implements Unit {
         } else {
             deadSprite.setPosition(x + 4, y - 20);
         }
-        lManager.insert(deadSprite, 4);
+        //lManager.insert(deadSprite, 4);
         Thread t = new Thread(new Runnable() {
 
             public void run() {
-                for (int i = 0; i < 8; i++) {
-                    deadSprite.nextFrame();
-                    try {
-                        Thread.sleep(200);
-                    } catch (InterruptedException ex) {
-                        ex.printStackTrace();
+                synchronized (lManager) {
+                    lManager.insert(deadSprite, 4);
+                    for (int i = 0; i < 8; i++) {
+                        deadSprite.nextFrame();
+                        try {
+                            Thread.sleep(200);
+                        } catch (InterruptedException ex) {
+                            ex.printStackTrace();
+                        }
                     }
+                    lManager.remove(deadSprite);
+                    lManager.remove(sprite);
                 }
-                lManager.remove(deadSprite);
-                lManager.remove(sprite);
             }
         });
         t.start();

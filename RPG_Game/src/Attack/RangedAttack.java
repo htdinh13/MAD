@@ -19,7 +19,7 @@ public class RangedAttack extends AttackAbstract {
 
     private int direction, startFrame;
     private int currX, currY, destX, destY;
-   // private Unit attacked, attacker;
+    // private Unit attacked, attacker;
 
     public RangedAttack(Image img, int width, int height) {
         super(img, width, height);
@@ -77,43 +77,45 @@ public class RangedAttack extends AttackAbstract {
     }
 
     public void run() {
-        super.getAttackSpr().setFrame(startFrame);
-        while (!((currX == destX) && (currY == destY))) {
-            switch (direction) {
-                case 0:
-                    currY--;
-                    super.getAttackSpr().setPosition(currX, currY);
-                    break;
-                case 1:
-                    currY++;
-                    super.getAttackSpr().setPosition(currX, currY);
-                    break;
-                case 2:
-                    currX--;
-                    super.getAttackSpr().setPosition(currX, currY);
-                    break;
-                case 3:
-                    currX++;
-                    super.getAttackSpr().setPosition(currX, currY);
-                    break;
-                default:
-                    break;
+        synchronized (super.getLManager()) {
+            super.getAttackSpr().setFrame(startFrame);
+            while (!((currX == destX) && (currY == destY))) {
+                switch (direction) {
+                    case 0:
+                        currY--;
+                        super.getAttackSpr().setPosition(currX, currY);
+                        break;
+                    case 1:
+                        currY++;
+                        super.getAttackSpr().setPosition(currX, currY);
+                        break;
+                    case 2:
+                        currX--;
+                        super.getAttackSpr().setPosition(currX, currY);
+                        break;
+                    case 3:
+                        currX++;
+                        super.getAttackSpr().setPosition(currX, currY);
+                        break;
+                    default:
+                        break;
+                }
+                try {
+                    Thread.sleep(20);
+                } catch (InterruptedException ex) {
+                    ex.printStackTrace();
+                }
+
             }
-            try {
-                Thread.sleep(20);
-            } catch (InterruptedException ex) {
-                ex.printStackTrace();
+            for (int i = 0; i < super.getAttackSpr().getFrameSequenceLength() / 2 - 2; i++) {
+                super.getAttackSpr().nextFrame();
+                try {
+                    Thread.sleep(150);
+                } catch (InterruptedException ex) {
+                    ex.printStackTrace();
+                }
             }
-            
+            super.getLManager().remove(super.getAttackSpr());
         }
-        for (int i = 0; i < super.getAttackSpr().getFrameSequenceLength() / 2 - 2; i++) {
-            super.getAttackSpr().nextFrame();
-            try {
-                Thread.sleep(150);
-            } catch (InterruptedException ex) {
-                ex.printStackTrace();
-            }
-        }
-        super.getLManager().remove(super.getAttackSpr());        
     }
 }

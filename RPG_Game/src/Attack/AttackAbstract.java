@@ -38,17 +38,19 @@ public abstract class AttackAbstract implements Attackable, Runnable {
     }
 
     public void run() {
-        attackSpr.setFrame(1);
-        //while(true){
-        for (int i = 0; i < attackSpr.getFrameSequenceLength() - 2; i++) {
-            attackSpr.nextFrame();
-            try {
-                Thread.sleep(250);
-            } catch (InterruptedException ex) {
-                ex.printStackTrace();
+        synchronized (lManager) {
+            attackSpr.setFrame(1);
+            //while(true){
+            for (int i = 0; i < attackSpr.getFrameSequenceLength() - 2; i++) {
+                attackSpr.nextFrame();
+                try {
+                    Thread.sleep(250);
+                } catch (InterruptedException ex) {
+                    ex.printStackTrace();
+                }
             }
+            lManager.remove(attackSpr);
         }
-        lManager.remove(attackSpr);
     }
 
     public LayerManager getLManager() {

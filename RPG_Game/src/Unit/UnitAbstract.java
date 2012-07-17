@@ -10,7 +10,7 @@ import javax.microedition.lcdui.game.Sprite;
  * @author HOANG TRUONG DINH
  */
 public abstract class UnitAbstract implements Unit {
-
+    
     private Sprite sprite, endSprite, deadSprite;
     private int x, y, moveSpace;
     private boolean endTurn;
@@ -27,39 +27,39 @@ public abstract class UnitAbstract implements Unit {
         endTurn = false;
         this.attackType = attackType;
     }
-
+    
     public int getX() {
         return x;
     }
-
+    
     public int getY() {
         return y;
     }
-
+    
     public void setX(int x) {
         this.x = x;
     }
-
+    
     public void setY(int y) {
         this.y = y;
     }
-
+    
     public boolean getEndTurn() {
         return endTurn;
     }
-
+    
     public int getMoveSpace() {
         return moveSpace;
     }
-
+    
     public Sprite getSprite() {
         return sprite;
     }
-
+    
     public void setEndTurn(boolean endTurn) {
         this.endTurn = endTurn;
     }
-
+    
     public void endTurn(LayerManager lManager, Image image) {
         endSprite = new Sprite(image);
         endSprite.setVisible(true);
@@ -67,22 +67,22 @@ public abstract class UnitAbstract implements Unit {
         lManager.insert(endSprite, 4);
         endTurn = true;
     }
-
+    
     public void newTurn(LayerManager lManager) {
         endTurn = false;
         lManager.remove(endSprite);
     }
-
+    
     public void move(int x, int y) {
         this.x = x;
         this.y = y;
         sprite.setPosition(x, y);
     }
-
+    
     public Attackable getAttackType() {
         return attackType;
     }
-
+    
     public void isDead(final LayerManager lManager, Image image) {
         deadSprite = new Sprite(image, 15, 20);
         deadSprite.setVisible(true);
@@ -93,12 +93,13 @@ public abstract class UnitAbstract implements Unit {
         }
         //lManager.insert(deadSprite, 4);
         Thread t = new Thread(new Runnable() {
-
+            
             public void run() {
                 synchronized (lManager) {
                     lManager.insert(deadSprite, 4);
                     for (int i = 0; i < 8; i++) {
                         deadSprite.nextFrame();
+                        sprite.setVisible(i%2==0);
                         try {
                             Thread.sleep(200);
                         } catch (InterruptedException ex) {

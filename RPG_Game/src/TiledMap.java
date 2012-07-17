@@ -1,12 +1,9 @@
-/*
- * To change this template, choose Tools | Templates
- * and open the template in the editor.
- */
 
 /**
  *
  * @author Luu Manh 13
  */
+import Algorithm.Cell;
 import Attack.Attackable;
 import Attack.CavalryAttack;
 import Attack.KnightAttack;
@@ -74,7 +71,7 @@ class GameCanvasTiledLayerDemo extends GameCanvas implements Runnable {
         {2, 2, 2, 2, 1, 1, 1, 1, 10, 10, 1, 1, 1, 1, 1, 1, 1, 1, 1, 17, 4, 6, 4, 4, 4},
         {2, 2, 2, 2, 2, 2, 1, 1, 10, 10, 1, 1, 1, 1, 1, 1, 1, 1, 1, 11, 4, 4, 4, 4, 4}
     };
-    private Cell attackCells[];
+    private Cell attackCells[], movingCells[];
     private boolean onSelected, isMoved, isMoving, isAI, isAttacking;
     private Unit selectedUnit;
 
@@ -166,7 +163,7 @@ class GameCanvasTiledLayerDemo extends GameCanvas implements Runnable {
     public void createPLUnits() {
         pl_units[0] = new PlayerUnit(2, 2, images[16], 5, new CavalryAttack(images[5], lManager));
         pl_units[1] = new PlayerUnit(3, 3, images[18], 4, new KnightAttack(images[4], lManager));
-        pl_units[2] = new PlayerUnit(3, 9, images[20], 3, new RangedAttack(images[6], lManager));
+        pl_units[2] = new PlayerUnit(9, 3, images[20], 3, new RangedAttack(images[6], lManager));
         pl_units[3] = new PlayerUnit(2, 8, images[17], 5, new CavalryAttack(images[5], lManager));
         pl_units[4] = new PlayerUnit(3, 8, images[19], 5, new CavalryAttack(images[5], lManager));
         for (int i = 0; i < pl_units.length; i++) {
@@ -194,11 +191,15 @@ class GameCanvasTiledLayerDemo extends GameCanvas implements Runnable {
         int row = selectedUnit.getY() / 24;
         int space = selectedUnit.getMoveSpace();
         movingLayer = new TiledLayer(space * 2 + 1, space * 2 + 1, images[10], 24, 24);
+        movingCells = new Cell[(space + 1) * (space + 1) + space * space];
+        int counter = 0;
         for (int i = 0; i < space * 2 + 1; i++) {
             for (int j = 0; j < space * 2 + 1; j++) {
                 if (!(j == space && i == space) && ((i <= space) && (j >= space - i) && (j <= space + i) || ((i > space) && (j >= i - space) && (j < space * 2 + 1 - i + space)))) {
                     int a = j + col - space, b = i + row - space;
                     if (a >= 0 && b >= 0 && a < 25 && b < 15) {
+                        movingCells[counter] = new Cell(a, b);
+                        counter++;
                         if (backgroundLayer.getCell(a, b) < 10) {
                             if (getPLUnit(a * 24, b * 24) == null) {
                                 if (getAIUnit(a * 24, b * 24) == null) {
@@ -212,6 +213,12 @@ class GameCanvasTiledLayerDemo extends GameCanvas implements Runnable {
         }
         movingLayer.setPosition((col - space) * 24, (row - space) * 24);
         lManager.insert(movingLayer, 28);
+    }
+
+    public void removeUnmoveableCell(Unit selectedUnit) {
+        int col = selectedUnit.getX() / 24;
+        int row = selectedUnit.getY() / 24;
+        
     }
 
     public void createAttackingLayer(Unit selectedUnit) {

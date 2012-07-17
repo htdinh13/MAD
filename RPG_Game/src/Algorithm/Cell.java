@@ -1,3 +1,5 @@
+package Algorithm;
+
 
 /**
  *
@@ -6,6 +8,8 @@
 public class Cell {
 
     private int x, y;
+    Cell[] neighbors;
+    Cell pathParent;
 
     public Cell(int x, int y) {
         this.x = x;

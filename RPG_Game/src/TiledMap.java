@@ -130,7 +130,7 @@ class GameCanvasTiledLayerDemo extends GameCanvas implements Runnable {
     }
 
     public void createAIUnits() {
-        ai_units[0] = new AIUnit(10, 2, images[14], 5, new CavalryAttack(images[5], lManager));
+        ai_units[0] = new AIUnit(1, 8, images[14], 5, new CavalryAttack(images[5], lManager));
         ai_units[1] = new AIUnit(10, 3, images[14], 5, new CavalryAttack(images[5], lManager));
         ai_units[2] = new AIUnit(11, 2, images[14], 5, new CavalryAttack(images[5], lManager));
         ai_units[3] = new AIUnit(11, 3, images[14], 5, new CavalryAttack(images[5], lManager));
@@ -165,7 +165,7 @@ class GameCanvasTiledLayerDemo extends GameCanvas implements Runnable {
         pl_units[1] = new PlayerUnit(3, 3, images[18], 4, new KnightAttack(images[4], lManager));
         pl_units[2] = new PlayerUnit(9, 3, images[20], 3, new RangedAttack(images[6], lManager));
         pl_units[3] = new PlayerUnit(2, 8, images[17], 5, new CavalryAttack(images[5], lManager));
-        pl_units[4] = new PlayerUnit(3, 8, images[19], 5, new CavalryAttack(images[5], lManager));
+        pl_units[4] = new PlayerUnit(12, 3, images[19], 5, new CavalryAttack(images[5], lManager));
         for (int i = 0; i < pl_units.length; i++) {
             if (pl_units[i] != null) {
                 lManager.append(pl_units[i].getSprite());
@@ -211,14 +211,50 @@ class GameCanvasTiledLayerDemo extends GameCanvas implements Runnable {
                 }
             }
         }
+        removeUnmoveableCell(space);
         movingLayer.setPosition((col - space) * 24, (row - space) * 24);
         lManager.insert(movingLayer, 28);
     }
 
-    public void removeUnmoveableCell(Unit selectedUnit) {
-        int col = selectedUnit.getX() / 24;
-        int row = selectedUnit.getY() / 24;
-        
+    public Unit[] getAIMovingLayer() {
+        int count = 0;
+        Unit[] ais = new Unit[movingCells.length];
+        for (int i = 0; i < movingCells.length; i++) {
+            if (movingCells[i] != null) {
+                Unit u = getAIUnit(movingCells[i].getX() * 24, movingCells[i].getY() * 24);
+                if (u != null) {
+                    ais[count] = u;
+                    count++;
+                }
+            }
+        }
+        Unit[] re_ais = null;
+        if (count > 0) {
+            re_ais = new Unit[count];
+            for (int i = 0; i < re_ais.length; i++) {
+                re_ais[i] = ais[i];
+            }
+        }
+        return re_ais;
+    }
+
+    public void removeUnmoveableCell(int space) {
+        int col = selectedUnit.getX();
+        int row = selectedUnit.getY();
+
+        Unit[] ais = getAIMovingLayer();
+        if (ais != null) {
+            for (int i = 0; i < ais.length; i++) {
+                if (ais[i].getX() < col && ais[i].getY() < row) {
+                    System.out.println("AI " + ais[i].getX() / 24 + "," + ais[i].getY() / 24);
+                    for (int j = 0; j < movingCells.length; j++) {
+                        if (movingCells[j] != null && movingCells[j].getX() <= ais[i].getX()/24 && movingCells[j].getY() <= ais[i].getY()/24) {
+                            System.out.println("Cell " + movingCells[j].getX() + "," + movingCells[j].getY());
+                        }
+                    }
+                }
+            }
+        }
     }
 
     public void createAttackingLayer(Unit selectedUnit) {

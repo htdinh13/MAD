@@ -1,6 +1,5 @@
 package Algorithm;
 
-
 /**
  *
  * @author HOANG TRUONG DINH
@@ -8,6 +7,7 @@ package Algorithm;
 public class Cell {
 
     private int x, y;
+    private int col, row;
     Cell[] neighbors;
     Cell pathParent;
 

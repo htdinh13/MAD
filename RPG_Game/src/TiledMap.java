@@ -112,15 +112,8 @@ class GameCanvasTiledLayerDemo extends GameCanvas implements Runnable {
         cursorSpr.setVisible(true);
         cursorSpr.setPosition(cursorSpr.getX_(), cursorSpr.getY_());
 
-        //Create attackable
-//        Attackable attack = new KnightAttack(images[4],lManager);
-//        lManager.insert(attack.getAttackSpr(), 0);
-//        attack.start();
-        //end attackable
-
         createPLUnits();
         createAIUnits();
-        //ai_units[4].isDead(lManager,images[8]);
 
         lManager.insert(cursorSpr, 1);
         lManager.insert(backgroundLayer, lManager.getSize());
@@ -130,7 +123,7 @@ class GameCanvasTiledLayerDemo extends GameCanvas implements Runnable {
     }
 
     public void createAIUnits() {
-        ai_units[0] = new AIUnit(1, 8, images[14], 5, new CavalryAttack(images[5], lManager));
+        ai_units[0] = new AIUnit(1, 7, images[14], 5, new CavalryAttack(images[5], lManager));
         ai_units[1] = new AIUnit(10, 3, images[14], 5, new CavalryAttack(images[5], lManager));
         ai_units[2] = new AIUnit(11, 2, images[14], 5, new CavalryAttack(images[5], lManager));
         ai_units[3] = new AIUnit(11, 3, images[14], 5, new CavalryAttack(images[5], lManager));
@@ -198,65 +191,73 @@ class GameCanvasTiledLayerDemo extends GameCanvas implements Runnable {
                 if (!(j == space && i == space) && ((i <= space) && (j >= space - i) && (j <= space + i) || ((i > space) && (j >= i - space) && (j < space * 2 + 1 - i + space)))) {
                     int a = j + col - space, b = i + row - space;
                     if (a >= 0 && b >= 0 && a < 25 && b < 15) {
-                        movingCells[counter] = new Cell(a, b);
                         counter++;
                         if (backgroundLayer.getCell(a, b) < 10) {
                             if (getPLUnit(a * 24, b * 24) == null) {
                                 if (getAIUnit(a * 24, b * 24) == null) {
                                     movingLayer.setCell(j, i, 2);
+//                                    System.out.println("J,I: " + j + "," + i);
+                                    movingCells[counter] = new Cell(a, b);
+                                } else {
+                                    movingCells[counter] = new Cell(a, b, false);
                                 }
+                            } else {
+                                movingCells[counter] = new Cell(a, b, false);
                             }
+                        } else {
+                            movingCells[counter] = new Cell(a, b, false);
                         }
                     }
                 }
             }
         }
-        removeUnmoveableCell(space);
         movingLayer.setPosition((col - space) * 24, (row - space) * 24);
+//        removeUnmoveableCell(space);
         lManager.insert(movingLayer, 28);
     }
 
-    public Unit[] getAIMovingLayer() {
-        int count = 0;
-        Unit[] ais = new Unit[movingCells.length];
-        for (int i = 0; i < movingCells.length; i++) {
-            if (movingCells[i] != null) {
-                Unit u = getAIUnit(movingCells[i].getX() * 24, movingCells[i].getY() * 24);
-                if (u != null) {
-                    ais[count] = u;
-                    count++;
-                }
-            }
-        }
-        Unit[] re_ais = null;
-        if (count > 0) {
-            re_ais = new Unit[count];
-            for (int i = 0; i < re_ais.length; i++) {
-                re_ais[i] = ais[i];
-            }
-        }
-        return re_ais;
-    }
-
-    public void removeUnmoveableCell(int space) {
-        int col = selectedUnit.getX();
-        int row = selectedUnit.getY();
-
-        Unit[] ais = getAIMovingLayer();
-        if (ais != null) {
-            for (int i = 0; i < ais.length; i++) {
-                if (ais[i].getX() < col && ais[i].getY() < row) {
-                    System.out.println("AI " + ais[i].getX() / 24 + "," + ais[i].getY() / 24);
-                    for (int j = 0; j < movingCells.length; j++) {
-                        if (movingCells[j] != null && movingCells[j].getX() <= ais[i].getX()/24 && movingCells[j].getY() <= ais[i].getY()/24) {
-                            System.out.println("Cell " + movingCells[j].getX() + "," + movingCells[j].getY());
-                        }
-                    }
-                }
-            }
-        }
-    }
-
+//    public Unit[] getAIinMovingLayer() {
+//        int count = 0;
+//        Unit[] ais = new Unit[movingCells.length];
+//        for (int i = 0; i < movingCells.length; i++) {
+//            if (movingCells[i] != null) {
+//                Unit u = getAIUnit(movingCells[i].getX() * 24, movingCells[i].getY() * 24);
+//                if (u != null) {
+//                    ais[count] = u;
+//                    count++;
+//                }
+//            }
+//        }
+//        Unit[] re_ais = null;
+//        if (count > 0) {
+//            re_ais = new Unit[count];
+//            for (int i = 0; i < re_ais.length; i++) {
+//                re_ais[i] = ais[i];
+//            }
+//        }
+//        return re_ais;
+//    }
+//    public void removeUnmoveableCell(int space) {
+//        int col = selectedUnit.getX()/24;
+//        int row = selectedUnit.getY()/24;
+//        System.out.println(col + "," + row);
+//        int x = movingLayer.getX() / 24;
+//        int y = movingLayer.getY() / 24;
+//        Unit[] ais = getAIinMovingLayer();
+//        if (ais != null) {
+//            for (int i = 0; i < ais.length; i++) {
+//                if (ais[i].getX()/24 < col && ais[i].getY()/24 < row) {
+//                    System.out.println("AI " + ais[i].getX() / 24 + "," + ais[i].getY() / 24);
+//                    for (int j = 0; j < movingCells.length; j++) {
+//                        if (movingCells[j] != null && movingCells[j].getX() <= ais[i].getX() / 24 && movingCells[j].getY() <= ais[i].getY() / 24) {
+//                            movingCells[j].setCanMove(false);
+//                            System.out.println("Cell " + movingCells[j].getX() + "," + movingCells[j].getY());
+//                        }
+//                    }
+//                }
+//            }
+//        }
+//    }
     public void createAttackingLayer(Unit selectedUnit) {
         int col = cursorSpr.getX_() / 24;
         int row = cursorSpr.getY_() / 24;
@@ -533,7 +534,6 @@ class GameCanvasTiledLayerDemo extends GameCanvas implements Runnable {
                             selectedUnit.getAttackType().attack(selectedUnit, attacked);
                             selectedUnit.getAttackType().start();
                             // Attack
-
                             attacked.isDead(lManager, images[8]);
                             unitEndTurned();
                         }
@@ -541,18 +541,19 @@ class GameCanvasTiledLayerDemo extends GameCanvas implements Runnable {
                 } else {
                     if (!isMoved) {
                         // Change to moved state (can undo)
-                        selectedUnit.move(cursorSpr.getX(), cursorSpr.getY());
-                        selectedSpr.setVisible(false);
-                        movingLayer.setVisible(false);
-                        isMoved = true;
-                        movedSpr = new Sprite(images[11], 22, 14);
-                        movedSpr.setFrame(1);
-                        if (cursorSpr.getY_() == 0) {
-                            movedSpr.setPosition(cursorSpr.getX_() + 1, cursorSpr.getY_() + 24);
-                        } else {
-                            movedSpr.setPosition(cursorSpr.getX_() + 1, cursorSpr.getY_() - 14);
+                        if (selectedUnit.move(cursorSpr.getX(), cursorSpr.getY(), movingCells)) {
+                            selectedSpr.setVisible(false);
+                            movingLayer.setVisible(false);
+                            isMoved = true;
+                            movedSpr = new Sprite(images[11], 22, 14);
+                            movedSpr.setFrame(1);
+                            if (cursorSpr.getY_() == 0) {
+                                movedSpr.setPosition(cursorSpr.getX_() + 1, cursorSpr.getY_() + 24);
+                            } else {
+                                movedSpr.setPosition(cursorSpr.getX_() + 1, cursorSpr.getY_() - 14);
+                            }
+                            lManager.insert(movedSpr, 3);
                         }
-                        lManager.insert(movedSpr, 3);
                     } else {
                         if (!isAttacking) {
                             switch (movedSpr.getFrame()) {

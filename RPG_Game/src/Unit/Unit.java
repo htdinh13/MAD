@@ -1,5 +1,6 @@
 package Unit;
 
+import Algorithm.Cell;
 import Attack.Attackable;
 import javax.microedition.lcdui.Image;
 import javax.microedition.lcdui.game.LayerManager;
@@ -19,7 +20,7 @@ public interface Unit {
 
     public int getMoveSpace();
 
-    public void move(int x, int y);
+    public boolean move(int x, int y, Cell[] movingCells);
 
     public void endTurn(LayerManager lManager, Image image);
 

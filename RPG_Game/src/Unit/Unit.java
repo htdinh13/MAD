@@ -22,6 +22,8 @@ public interface Unit {
 
     public boolean move(int x, int y, Cell[] movingCells);
 
+    public void move(int x, int y);
+
     public void endTurn(LayerManager lManager, Image image);
 
     public void newTurn(LayerManager lManager);

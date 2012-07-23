@@ -74,6 +74,11 @@ public abstract class UnitAbstract implements Unit {
         lManager.remove(endSprite);
     }
 
+    public void move(int x, int y) {
+        this.x = x;
+        this.y = y;
+    }
+
     public boolean move(int x, int y, Cell[] movingCells) {
         this.x = x;
         this.y = y;

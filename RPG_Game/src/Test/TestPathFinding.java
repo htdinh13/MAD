@@ -19,10 +19,6 @@ import javax.microedition.lcdui.game.TiledLayer;
 import javax.microedition.midlet.MIDlet;
 import javax.microedition.midlet.MIDletStateChangeException;
 
-/**
- *
- * @author Luu Manh 13
- */
 public class TestPathFinding extends MIDlet implements CommandListener {
 
     private Display mDisplay;

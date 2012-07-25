@@ -41,18 +41,20 @@ public class LinkedList {
     }
 
     public void add(Node node) {
-        if (head != null) {
-            final Node l = last;
-            l.next = node;
-            node.prev = l;
-            last = node;
-        } else {
-            addFirst(node);
+        if (!this.contains(node)) {
+            if (head != null) {
+                final Node l = last;
+                l.next = node;
+                node.prev = l;
+                last = node;
+            } else {
+                addFirst(node);
+            }
         }
     }
 
     public void clear() {
-        while (!this.isEmpty()) {
+        while (head != null) {
             (this.removeFirst()).reset();
         }
     }

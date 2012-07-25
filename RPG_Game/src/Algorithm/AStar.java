@@ -41,19 +41,26 @@ public class AStar {
     protected void resetNodes() {
         if (goal != null) {
             goal.reset();
+            System.out.println("Reset Goal");
         }
         if (start != null) {
             start.reset();
+            System.out.println("Reset Start");
         }
         if (open != null) {
+            System.out.println("Reset OPEN");
             open.clear();
         }
         if (closed != null) {
+            System.out.println("Reset CLOSED");
             closed.clear();
         }
     }
 
     public LinkedList findPath(Node start, Node goal) {
+        this.reset();
+        open.print();
+        closed.print();
         this.start = start;
         this.goal = goal;
         return startSearch(start, goal);
@@ -71,6 +78,7 @@ public class AStar {
             node.setVisitOrder(order++);
 
             if (node.compareTo(goal) == 0) {
+
                 return constructPath(node);
             } else {
                 for (int i = 0; i < node.getNeighbours().length; i++) {
@@ -92,6 +100,8 @@ public class AStar {
                         }
                     }
                 }
+                System.out.println("=====OPEN LIST=====");
+                open.print();
                 closed.add(node);
             }
         }

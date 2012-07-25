@@ -86,6 +86,8 @@ public class Node implements Comparable {
     }
 
     public void reset() {
+        next = null;
+        prev = null;
         visited = false;
         visitOrder = 0;
         parent = null;

@@ -61,7 +61,7 @@ public class RPGMap extends GameCanvas implements Runnable {
     //For PathFinding
     int gridCols, gridRows;
     Node start, goal;
-    AStar atar;
+    AStar astar;
     LinkedList path;
 
     public void loadImages() throws IOException {
@@ -84,6 +84,11 @@ public class RPGMap extends GameCanvas implements Runnable {
         this.ai_units = new Unit[23];
         this.pl_units = new Unit[5];
         this.lManager = new LayerManager();
+
+        openList = new LinkedList();
+        closedList = new LinkedList();
+        astar = new AStar(openList, closedList);
+
         try {
             loadImages();
         } catch (IOException ex) {
@@ -210,18 +215,6 @@ public class RPGMap extends GameCanvas implements Runnable {
                 counter++;
             }
         }
-        movingLayer.setPosition((col - space) * 24, (row - space) * 24);
-//        removeUnmoveableCell(space);
-        lManager.insert(movingLayer, 28);
-        return movingCells;
-    }
-
-    public LinkedList move(int goalX, int goalY) {
-        int x_ = goalX / 24, y_ = goalY / 24;
-        goal = new Node(new Cell(x_, y_), -1);
-        LinkedList openList = new LinkedList();
-        LinkedList closedList = new LinkedList();
-        AStar astar = new AStar(openList, closedList);
         for (int x = 0; x < gridCols; x++) {
             for (int y = 0; y < gridRows; y++) {
                 if (y - 1 >= 0) {
@@ -238,6 +231,18 @@ public class RPGMap extends GameCanvas implements Runnable {
                 }
             }
         }
+        movingLayer.setPosition((col - space) * 24, (row - space) * 24);
+//        removeUnmoveableCell(space);
+        lManager.insert(movingLayer, 28);
+        
+        System.out.println("CREATING MOVING CELL");
+        return movingCells;
+    }
+    LinkedList openList, closedList;
+
+    public LinkedList move(int goalX, int goalY) {
+        int x_ = goalX / 24, y_ = goalY / 24;
+        goal = new Node(new Cell(x_, y_), -1);
         return astar.findPath(start, goal);
     }
 
@@ -353,6 +358,7 @@ public class RPGMap extends GameCanvas implements Runnable {
                         }
                     }
                 }
+                System.out.println("OnSelected " + onSelected + " IsMoving " + isMoving + " IsAttacking " + isAttacking + " IsMoved " + isMoved);
                 break;
             case KEY_STAR:
                 break;
@@ -524,19 +530,28 @@ public class RPGMap extends GameCanvas implements Runnable {
                 } else {
                     if (!isMoved) {
                         // Change to moved state (can undo)
-                        path = move(cursorSpr.getX(), cursorSpr.getY());
+                        try {
+                            if (path != null) {
+                                path.clear();
+                            }
+                            path = move(cursorSpr.getX(), cursorSpr.getY());
+                        } catch (Exception ex) {
+                            ex.printStackTrace();
+                        }
+                        System.out.println("Finish Finding");
                         if (selectedUnit.move(this, cursorSpr, lManager, path, images[11])) {
+                            //selectedUnit.move(cursorSpr.getX_(), cursorSpr.getY_());
                             selectedSpr.setVisible(false);
                             movingLayer.setVisible(false);
                             isMoved = true;
-//                            movedSpr = new Sprite(images[11], 22, 14);
-//                            movedSpr.setFrame(1);
-//                            if (cursorSpr.getY_() == 0) {
-//                                movedSpr.setPosition(cursorSpr.getX_() + 1, cursorSpr.getY_() + 24);
-//                            } else {
-//                                movedSpr.setPosition(cursorSpr.getX_() + 1, cursorSpr.getY_() - 14);
-//                            }
-//                            lManager.insert(movedSpr, 3);
+//                        movedSpr = new Sprite(images[11], 22, 14);
+//                        movedSpr.setFrame(1);
+//                        if (cursorSpr.getY_() == 0) {
+//                            movedSpr.setPosition(cursorSpr.getX_() + 1, cursorSpr.getY_() + 24);
+//                        } else {
+//                            movedSpr.setPosition(cursorSpr.getX_() + 1, cursorSpr.getY_() - 14);
+//                        }
+//                        lManager.insert(movedSpr, 3);
                         }
                     } else {
                         if (!isAttacking) {
@@ -569,6 +584,7 @@ public class RPGMap extends GameCanvas implements Runnable {
                     }
                 }
             }
+            System.out.println("OnSelected " + onSelected + " IsMoving " + isMoving + " IsAttacking " + isAttacking + " IsMoved " + isMoved);
         }
         if (!onSelected) {
             cursorSpr.move(action);
@@ -707,5 +723,14 @@ public class RPGMap extends GameCanvas implements Runnable {
             }
         }
         return null;
+    }
+
+    public boolean endTurn(Unit[] units) {
+        for (int i = 0; i < units.length; i++) {
+            if (!units[i].getEndTurn()) {
+                return false;
+            }
+        }
+        return true;
     }
 }

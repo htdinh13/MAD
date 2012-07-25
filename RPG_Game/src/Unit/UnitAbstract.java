@@ -82,7 +82,7 @@ public abstract class UnitAbstract implements Unit {
         this.y = y;
     }
 
-    public boolean move(final RPGMap map, final Cursor cursor, final LayerManager lManager, final LinkedList path,final Image image) {
+    public boolean move(final RPGMap map, final Cursor cursor, final LayerManager lManager, final LinkedList path, final Image image) {
         if (path != null) {
             Thread t = new Thread(new Runnable() {
 
@@ -102,7 +102,7 @@ public abstract class UnitAbstract implements Unit {
                                 ex.printStackTrace();
                             }
                         }
-                        
+
                         map.movedSpr = new Sprite(image, 22, 14);
                         map.movedSpr.setFrame(1);
                         if (cursor.getY_() == 0) {
@@ -115,7 +115,6 @@ public abstract class UnitAbstract implements Unit {
                 }
             });
             t.start();
-            System.out.println(x + "," + y);
             return true;
         }
 

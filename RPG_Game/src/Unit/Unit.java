@@ -3,7 +3,7 @@ package Unit;
 import Algorithm.LinkedList;
 import Attack.Attackable;
 import View.Cursor;
-import com.sun.midp.lcdui.GameMap;
+import View.RPGMap;
 import javax.microedition.lcdui.Image;
 import javax.microedition.lcdui.game.LayerManager;
 import javax.microedition.lcdui.game.Sprite;
@@ -21,7 +21,7 @@ public interface Unit {
 
     public int getMoveSpace();
 
-    public boolean move(GameMap map, Cursor cursor, final LayerManager lManager, LinkedList path);
+    public boolean move(RPGMap map,Cursor cursor, final LayerManager lManager, LinkedList path, Image image);
 
     public void move(int x, int y);
 

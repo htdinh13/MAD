@@ -4,7 +4,7 @@ import Algorithm.LinkedList;
 import Algorithm.Node;
 import Attack.Attackable;
 import View.Cursor;
-import com.sun.midp.lcdui.GameMap;
+import View.RPGMap;
 import javax.microedition.lcdui.Image;
 import javax.microedition.lcdui.game.LayerManager;
 import javax.microedition.lcdui.game.Sprite;
@@ -82,7 +82,7 @@ public abstract class UnitAbstract implements Unit {
         this.y = y;
     }
 
-    public boolean move(GameMap map, Cursor cursor, final LayerManager lManager, final LinkedList path) {
+    public boolean move(final RPGMap map, final Cursor cursor, final LayerManager lManager, final LinkedList path,final Image image) {
         if (path != null) {
             Thread t = new Thread(new Runnable() {
 
@@ -92,6 +92,8 @@ public abstract class UnitAbstract implements Unit {
                         while (n != null) {
                             x = n.getX() * 24;
                             y = n.getY() * 24;
+                            cursor.move(x, y);
+                            map.setActiveView(x, y);
                             sprite.setPosition(x, y);
                             n = n.next;
                             try {
@@ -100,6 +102,15 @@ public abstract class UnitAbstract implements Unit {
                                 ex.printStackTrace();
                             }
                         }
+                        
+                        map.movedSpr = new Sprite(image, 22, 14);
+                        map.movedSpr.setFrame(1);
+                        if (cursor.getY_() == 0) {
+                            map.movedSpr.setPosition(cursor.getX_() + 1, cursor.getY_() + 24);
+                        } else {
+                            map.movedSpr.setPosition(cursor.getX_() + 1, cursor.getY_() - 14);
+                        }
+                        lManager.insert(map.movedSpr, 3);
                     }
                 }
             });

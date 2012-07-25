@@ -44,16 +44,16 @@ public class Cursor extends Sprite {
     }
 
     public void move(int action) {
-        if ((action & GameMap.RIGHT_PRESSED) != 0 && x_ < (600 - 24)) {
+        if ((action & RPGMap.RIGHT_PRESSED) != 0 && x_ < (600 - 24)) {
             x_ += 24;
         }
-        if ((action & GameMap.LEFT_PRESSED) != 0 && x_ > 0) {
+        if ((action & RPGMap.LEFT_PRESSED) != 0 && x_ > 0) {
             x_ -= 24;
         }
-        if ((action & GameMap.UP_PRESSED) != 0 && y_ > 0) {
+        if ((action & RPGMap.UP_PRESSED) != 0 && y_ > 0) {
             y_ -= 24;
         }
-        if ((action & GameMap.DOWN_PRESSED) != 0 && y_ < (312 + 24)) {
+        if ((action & RPGMap.DOWN_PRESSED) != 0 && y_ < (312 + 24)) {
             y_ += 24;
         }
         this.setPosition(x_, y_);

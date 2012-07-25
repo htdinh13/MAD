@@ -167,7 +167,8 @@ class TestPathFindingMap extends GameCanvas implements Runnable {
                 if (path != null) {
                     selectedUnit.move(cursorSpr.getX_(), cursorSpr.getY_());
                     System.out.println("Current Position " + selectedUnit.getX() / 24 + "," + selectedUnit.getY() / 24);
-                }else{
+                    path.print();
+                } else {
                     System.out.println("NO WAY");
                 }
             }
@@ -235,7 +236,6 @@ class TestPathFindingMap extends GameCanvas implements Runnable {
         int col = selectedUnit.getX() / 24;
         int row = selectedUnit.getY() / 24;
         int space = selectedUnit.getMoveSpace();
-        System.out.println("Space move " + space);
         gridCols = space * 2 + 1;
         gridRows = space * 2 + 1;
         Node[][] movingCells = new Node[gridCols][gridRows];
@@ -243,7 +243,7 @@ class TestPathFindingMap extends GameCanvas implements Runnable {
         for (int i = 0; i < gridCols; i++) {
             for (int j = 0; j < gridRows; j++) {
                 int a = i + col - space, b = j + row - space;
-                //System.out.println(a + "," + b);
+                System.out.println(a + "," + b);
                 if (!(j == space && i == space) && ((i <= space) && (j >= space - i) && (j <= space + i) || ((i > space) && (j >= i - space) && (j < space * 2 + 1 - i + space)))) {
                     if (a >= 0 && b >= 0 && a < 25 && b < 15) {
                         if (backgroundLayer.getCell(a, b) < 10) {
@@ -273,7 +273,6 @@ class TestPathFindingMap extends GameCanvas implements Runnable {
                 counter++;
             }
         }
-        System.out.println("counter " + counter);
         return movingCells;
     }
     int gridCols, gridRows;
@@ -282,8 +281,6 @@ class TestPathFindingMap extends GameCanvas implements Runnable {
 
     public LinkedList move(int goalX, int goalY) {
         int x_ = goalX / 24, y_ = goalY / 24;
-        //if (backgroundLayer.getCell(x_, y_) < 10 && getAIUnit(x_, y_) == null) {
-        System.out.println("Create PathFinder");
         goal = new Node(new Cell(x_, y_), -1);
         LinkedList openList = new LinkedList();
         LinkedList closedList = new LinkedList();
@@ -291,9 +288,6 @@ class TestPathFindingMap extends GameCanvas implements Runnable {
         Node[][] movingMap = createMovingLayer();
         for (int x = 0; x < gridCols; x++) {
             for (int y = 0; y < gridRows; y++) {
-                //System.out.println(x+","+y);
-                System.out.println(x + "," + y + " NodeID:" + movingMap[x][y].getNodeId() + " " + movingMap[x][y].getX() + "," + movingMap[x][y].getY() + " " + movingMap[x][y].blocked);
-                //LinkedList neighbours = new LinkedList();
                 if (y - 1 >= 0) {
                     movingMap[x][y].getNeighbours()[0] = movingMap[x][y - 1];
                 }
@@ -308,17 +302,6 @@ class TestPathFindingMap extends GameCanvas implements Runnable {
                 }
             }
         }
-        for (int x = 0; x < gridCols; x++) {
-            for (int y = 0; y < gridRows; y++) {
-                System.out.println(x + "," + y + " NodeID:" + movingMap[x][y].getNodeId() + " " + movingMap[x][y].getX() + "," + movingMap[x][y].getY() + " " + movingMap[x][y].blocked);
-                System.out.println("Neighbours:");
-                for (int i = 0; i < movingMap[x][y].getNeighbours().length; i++) {
-                    System.out.println(movingMap[x][y].getNeighbours()[i]);
-                }
-            }
-        }
-        System.out.println("Finish PathFinder");
-        System.out.println("SNode " + start.getX() + "," + start.getY() + " GNode " + goal.getX() + "," + goal.getY());
         return astar.findPath(start, goal);
     }
 
@@ -346,7 +329,7 @@ class TestPathFindingMap extends GameCanvas implements Runnable {
         ai_units[1] = new AIUnit(10, 3, images[14], 5, new CavalryAttack(images[5], lManager));
         ai_units[2] = new AIUnit(11, 2, images[14], 5, new CavalryAttack(images[5], lManager));
         ai_units[3] = new AIUnit(11, 3, images[14], 5, new CavalryAttack(images[5], lManager));
-        ai_units[4] = new AIUnit(11, 0, images[14], 5, new CavalryAttack(images[5], lManager));
+        ai_units[4] = new AIUnit(11, 4, images[14], 5, new CavalryAttack(images[5], lManager));
         ai_units[5] = new AIUnit(11, 5, images[14], 5, new CavalryAttack(images[5], lManager));
         ai_units[6] = new AIUnit(12, 0, images[12], 3, new RangedAttack(images[6], lManager));
         ai_units[7] = new AIUnit(12, 5, images[12], 3, new RangedAttack(images[6], lManager));

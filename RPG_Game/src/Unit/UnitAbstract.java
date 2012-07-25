@@ -1,7 +1,10 @@
 package Unit;
 
-import Algorithm.Cell;
+import Algorithm.LinkedList;
+import Algorithm.Node;
 import Attack.Attackable;
+import View.Cursor;
+import com.sun.midp.lcdui.GameMap;
 import javax.microedition.lcdui.Image;
 import javax.microedition.lcdui.game.LayerManager;
 import javax.microedition.lcdui.game.Sprite;
@@ -79,15 +82,32 @@ public abstract class UnitAbstract implements Unit {
         this.y = y;
     }
 
-    public boolean move(int x, int y, Cell[] movingCells) {
-        this.x = x;
-        this.y = y;
-        for (int i = 0; i < movingCells.length; i++) {
-            if (movingCells[i] != null && movingCells[i].getX() == x / 24 && movingCells[i].getY() == y / 24 && movingCells[i].getCanMove()) {
-                sprite.setPosition(x, y);
-                return true;
-            }
+    public boolean move(GameMap map, Cursor cursor, final LayerManager lManager, final LinkedList path) {
+        if (path != null) {
+            Thread t = new Thread(new Runnable() {
+
+                public void run() {
+                    synchronized (lManager) {
+                        Node n = path.head;
+                        while (n != null) {
+                            x = n.getX() * 24;
+                            y = n.getY() * 24;
+                            sprite.setPosition(x, y);
+                            n = n.next;
+                            try {
+                                Thread.sleep(200);
+                            } catch (InterruptedException ex) {
+                                ex.printStackTrace();
+                            }
+                        }
+                    }
+                }
+            });
+            t.start();
+            System.out.println(x + "," + y);
+            return true;
         }
+
         return false;
     }
 

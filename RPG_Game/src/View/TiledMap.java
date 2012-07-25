@@ -1,11 +1,13 @@
 package View;
 
-
 /**
  *
  * @author Luu Manh 13
  */
+import Algorithm.AStar;
 import Algorithm.Cell;
+import Algorithm.LinkedList;
+import Algorithm.Node;
 import Attack.Attackable;
 import Attack.CavalryAttack;
 import Attack.KnightAttack;
@@ -32,10 +34,9 @@ public class TiledMap extends MIDlet implements CommandListener {
 
     protected void startApp() throws MIDletStateChangeException {
         mDisplay = Display.getDisplay(this);
-        GameCanvasTiledLayerDemo cv = new GameCanvasTiledLayerDemo(false);
+        GameMap cv = new GameMap(false);
         mDisplay.setCurrent(cv);
         cv.start();
-
     }
 
     public void commandAction(Command c, Displayable d) {
@@ -47,7 +48,7 @@ public class TiledMap extends MIDlet implements CommandListener {
  *
  * @author HOANG TRUONG DINH
  */
-class GameCanvasTiledLayerDemo extends GameCanvas implements Runnable {
+class GameMap extends GameCanvas implements Runnable {
 
     private int x, y, index;
     private Image[] images;
@@ -73,9 +74,15 @@ class GameCanvasTiledLayerDemo extends GameCanvas implements Runnable {
         {2, 2, 2, 2, 1, 1, 1, 1, 10, 10, 1, 1, 1, 1, 1, 1, 1, 1, 1, 17, 4, 6, 4, 4, 4},
         {2, 2, 2, 2, 2, 2, 1, 1, 10, 10, 1, 1, 1, 1, 1, 1, 1, 1, 1, 11, 4, 4, 4, 4, 4}
     };
-    private Cell attackCells[], movingCells[];
+    private Cell attackCells[];
+    private Node movingCells[][];
     private boolean onSelected, isMoved, isMoving, isAI, isAttacking;
     private Unit selectedUnit;
+    //For PathFinding
+    int gridCols, gridRows;
+    Node start, goal;
+    AStar atar;
+    LinkedList path;
 
     public void loadImages() throws IOException {
         images = new Image[21];
@@ -84,7 +91,7 @@ class GameCanvasTiledLayerDemo extends GameCanvas implements Runnable {
         }
     }
 
-    public GameCanvasTiledLayerDemo(boolean suppressKeyEvents) {
+    public GameMap(boolean suppressKeyEvents) {
         super(suppressKeyEvents);
         x = 0;
         y = 0;
@@ -181,86 +188,79 @@ class GameCanvasTiledLayerDemo extends GameCanvas implements Runnable {
         }
     }
 
-    public void createMovingLayer(Unit selectedUnit) {
+    public Node[][] createMovingLayer(Unit selectedUnit) {
         int col = selectedUnit.getX() / 24;
         int row = selectedUnit.getY() / 24;
         int space = selectedUnit.getMoveSpace();
-        movingLayer = new TiledLayer(space * 2 + 1, space * 2 + 1, images[10], 24, 24);
-        movingCells = new Cell[(space + 1) * (space + 1) + space * space];
+        gridCols = space * 2 + 1;
+        gridRows = space * 2 + 1;
+        movingLayer = new TiledLayer((gridCols), gridRows, images[10], 24, 24);
+        movingCells = new Node[gridCols][gridRows];
         int counter = 0;
-        for (int i = 0; i < space * 2 + 1; i++) {
-            for (int j = 0; j < space * 2 + 1; j++) {
+        for (int i = 0; i < gridCols; i++) {
+            for (int j = 0; j < gridRows; j++) {
+                int a = i + col - space, b = j + row - space;
                 if (!(j == space && i == space) && ((i <= space) && (j >= space - i) && (j <= space + i) || ((i > space) && (j >= i - space) && (j < space * 2 + 1 - i + space)))) {
-                    int a = j + col - space, b = i + row - space;
                     if (a >= 0 && b >= 0 && a < 25 && b < 15) {
-                        //System.out.println("Cell  "+a+","+b);
-                        counter++;
                         if (backgroundLayer.getCell(a, b) < 10) {
                             if (getPLUnit(a * 24, b * 24) == null) {
                                 if (getAIUnit(a * 24, b * 24) == null) {
-                                    movingLayer.setCell(j, i, 2);
-//                                    System.out.println("J,I: " + j + "," + i);
-                                    movingCells[counter] = new Cell(a, b);
+                                    movingLayer.setCell(i, j, 2);
+                                    movingCells[i][j] = new Node(new Cell(a, b), counter);
                                 } else {
-                                    movingCells[counter] = new Cell(a, b, false);
+                                    movingCells[i][j] = new Node(new Cell(a, b, false), counter);
                                 }
                             } else {
-                                movingCells[counter] = new Cell(a, b, false);
+                                movingCells[i][j] = new Node(new Cell(a, b), counter);
                             }
                         } else {
-                            movingCells[counter] = new Cell(a, b, false);
+                            movingCells[i][j] = new Node(new Cell(a, b, false), counter);
                         }
+                    } else {
+                        movingCells[i][j] = new Node(new Cell(a, b, false), counter);
+                    }
+                } else {
+                    if (j == space && i == space) {
+                        movingCells[i][j] = new Node(new Cell(a, b), counter);
+                        start = movingCells[i][j];
+                    } else {
+                        movingCells[i][j] = new Node(new Cell(a, b, false), counter);
                     }
                 }
+                counter++;
             }
         }
         movingLayer.setPosition((col - space) * 24, (row - space) * 24);
 //        removeUnmoveableCell(space);
         lManager.insert(movingLayer, 28);
+        return movingCells;
     }
 
-//    public Unit[] getAIinMovingLayer() {
-//        int count = 0;
-//        Unit[] ais = new Unit[movingCells.length];
-//        for (int i = 0; i < movingCells.length; i++) {
-//            if (movingCells[i] != null) {
-//                Unit u = getAIUnit(movingCells[i].getX() * 24, movingCells[i].getY() * 24);
-//                if (u != null) {
-//                    ais[count] = u;
-//                    count++;
-//                }
-//            }
-//        }
-//        Unit[] re_ais = null;
-//        if (count > 0) {
-//            re_ais = new Unit[count];
-//            for (int i = 0; i < re_ais.length; i++) {
-//                re_ais[i] = ais[i];
-//            }
-//        }
-//        return re_ais;
-//    }
-//    public void removeUnmoveableCell(int space) {
-//        int col = selectedUnit.getX()/24;
-//        int row = selectedUnit.getY()/24;
-//        System.out.println(col + "," + row);
-//        int x = movingLayer.getX() / 24;
-//        int y = movingLayer.getY() / 24;
-//        Unit[] ais = getAIinMovingLayer();
-//        if (ais != null) {
-//            for (int i = 0; i < ais.length; i++) {
-//                if (ais[i].getX()/24 < col && ais[i].getY()/24 < row) {
-//                    System.out.println("AI " + ais[i].getX() / 24 + "," + ais[i].getY() / 24);
-//                    for (int j = 0; j < movingCells.length; j++) {
-//                        if (movingCells[j] != null && movingCells[j].getX() <= ais[i].getX() / 24 && movingCells[j].getY() <= ais[i].getY() / 24) {
-//                            movingCells[j].setCanMove(false);
-//                            System.out.println("Cell " + movingCells[j].getX() + "," + movingCells[j].getY());
-//                        }
-//                    }
-//                }
-//            }
-//        }
-//    }
+    public LinkedList move(int goalX, int goalY) {
+        int x_ = goalX / 24, y_ = goalY / 24;
+        goal = new Node(new Cell(x_, y_), -1);
+        LinkedList openList = new LinkedList();
+        LinkedList closedList = new LinkedList();
+        AStar astar = new AStar(openList, closedList);
+        for (int x = 0; x < gridCols; x++) {
+            for (int y = 0; y < gridRows; y++) {
+                if (y - 1 >= 0) {
+                    movingCells[x][y].getNeighbours()[0] = movingCells[x][y - 1];
+                }
+                if (x + 1 < gridCols) {
+                    movingCells[x][y].getNeighbours()[1] = movingCells[x + 1][y];
+                }
+                if (y + 1 < gridRows) {
+                    movingCells[x][y].getNeighbours()[2] = movingCells[x][y + 1];
+                }
+                if (x - 1 >= 0) {
+                    movingCells[x][y].getNeighbours()[3] = movingCells[x - 1][y];
+                }
+            }
+        }
+        return astar.findPath(start, goal);
+    }
+
     public void createAttackingLayer(Unit selectedUnit) {
         int col = cursorSpr.getX_() / 24;
         int row = cursorSpr.getY_() / 24;
@@ -544,7 +544,8 @@ class GameCanvasTiledLayerDemo extends GameCanvas implements Runnable {
                 } else {
                     if (!isMoved) {
                         // Change to moved state (can undo)
-                        if (selectedUnit.move(cursorSpr.getX(), cursorSpr.getY(), movingCells)) {
+                        path = move(cursorSpr.getX(), cursorSpr.getY());
+                        if (selectedUnit.move(this, cursorSpr, lManager, path)) {
                             selectedSpr.setVisible(false);
                             movingLayer.setVisible(false);
                             isMoved = true;

@@ -13,24 +13,20 @@ public class Node implements Comparable {
     public Cell data;
     public Node next, prev;
     public Node parent;
-    //public LinkedList neighbours;
     public Node[] neighbours;
-    public int nodeID, gScore, hScore, visitOrder;
+    public int nodeID, costFromStart, estimatedCostToGoal, visitOrder;
     public boolean blocked, visited, partOfPath;
 
     public Node(Cell data, int nodeID) {
         this.data = data;
-        this.blocked = data.getCanMove();
+        this.blocked = !data.getCanMove();
         this.nodeID = nodeID;
         next = null;
         parent = null;
         prev = null;
-        //neighbours = new LinkedList();
         neighbours = new Node[4];
-    }
-
-    public Node(Node node) {
-    
+        costFromStart = 0;
+        estimatedCostToGoal = 0;
     }
 
     public Node getParent() {
@@ -48,15 +44,6 @@ public class Node implements Comparable {
     public void setNeighbours(Node[] neighbours) {
         this.neighbours = neighbours;
     }
-
-    
-//    public LinkedList getNeighbours() {
-//        return neighbours;
-//    }
-//
-//    public void setNeighbours(LinkedList neighbours) {
-//        this.neighbours = neighbours;
-//    }
 
     public int getNodeId() {
         return nodeID;
@@ -95,7 +82,7 @@ public class Node implements Comparable {
     }
 
     public int getEstimatedCostFromStartToGoal() {
-        return hScore + gScore;
+        return estimatedCostToGoal + costFromStart;
     }
 
     public void reset() {
@@ -103,7 +90,7 @@ public class Node implements Comparable {
         visitOrder = 0;
         parent = null;
         partOfPath = false;
-        hScore = 0;
+        estimatedCostToGoal = 0;
     }
 
     public String toString() {
@@ -118,8 +105,8 @@ public class Node implements Comparable {
         return this.data.getY();
     }
 
-    public int getEstimatedCostTo(Node start, Node goal) {
-        int estimatecost = Math.abs(start.getX() - goal.getX()) + Math.abs(start.getY() - goal.getY());
+    public int getEstimatedCostTo(Node goal) {
+        int estimatecost = Math.abs(this.getX() - goal.getX()) + Math.abs(this.getY() - goal.getY());
         return estimatecost;
     }
 

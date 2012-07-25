@@ -5,8 +5,6 @@ package View;
  * and open the template in the editor.
  */
 
-import View.GameCanvasTiledLayerDemo;
-import java.io.IOException;
 import javax.microedition.lcdui.Image;
 import javax.microedition.lcdui.game.Sprite;
 
@@ -46,16 +44,16 @@ public class Cursor extends Sprite {
     }
 
     public void move(int action) {
-        if ((action & GameCanvasTiledLayerDemo.RIGHT_PRESSED) != 0 && x_ < (600 - 24)) {
+        if ((action & GameMap.RIGHT_PRESSED) != 0 && x_ < (600 - 24)) {
             x_ += 24;
         }
-        if ((action & GameCanvasTiledLayerDemo.LEFT_PRESSED) != 0 && x_ > 0) {
+        if ((action & GameMap.LEFT_PRESSED) != 0 && x_ > 0) {
             x_ -= 24;
         }
-        if ((action & GameCanvasTiledLayerDemo.UP_PRESSED) != 0 && y_ > 0) {
+        if ((action & GameMap.UP_PRESSED) != 0 && y_ > 0) {
             y_ -= 24;
         }
-        if ((action & GameCanvasTiledLayerDemo.DOWN_PRESSED) != 0 && y_ < (312 + 24)) {
+        if ((action & GameMap.DOWN_PRESSED) != 0 && y_ < (312 + 24)) {
             y_ += 24;
         }
         this.setPosition(x_, y_);

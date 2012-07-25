@@ -178,7 +178,7 @@ public class LinkedList {
         Node current = head;
         int count = 1;
         while (current != null) {
-            System.out.println("\tNode " + count + " (" + current.data.getX() + "," + current.data.getY() + ") H=" + current.hScore);
+            System.out.println("\tNode " + count + " (" + current.data.getX() + "," + current.data.getY() + ") H=" + current.estimatedCostToGoal);
             current = current.next;
             count++;
         }

@@ -164,10 +164,11 @@ class TestPathFindingMap extends GameCanvas implements Runnable {
             } else {
                 System.out.println("Start Find Path");
                 LinkedList path = move(cursorSpr.getX_(), cursorSpr.getY_());
-                System.out.println("Finish Finding");
                 if (path != null) {
                     selectedUnit.move(cursorSpr.getX_(), cursorSpr.getY_());
                     System.out.println("Current Position " + selectedUnit.getX() / 24 + "," + selectedUnit.getY() / 24);
+                }else{
+                    System.out.println("NO WAY");
                 }
             }
         }
@@ -248,7 +249,6 @@ class TestPathFindingMap extends GameCanvas implements Runnable {
                         if (backgroundLayer.getCell(a, b) < 10) {
                             if (getPLUnit(a * 24, b * 24) == null) {
                                 if (getAIUnit(a * 24, b * 24) == null) {
-//                                    System.out.println("J,I: " + j + "," + i);
                                     movingCells[i][j] = new Node(new Cell(a, b), counter);
                                 } else {
                                     movingCells[i][j] = new Node(new Cell(a, b, false), counter);
@@ -295,99 +295,31 @@ class TestPathFindingMap extends GameCanvas implements Runnable {
                 System.out.println(x + "," + y + " NodeID:" + movingMap[x][y].getNodeId() + " " + movingMap[x][y].getX() + "," + movingMap[x][y].getY() + " " + movingMap[x][y].blocked);
                 //LinkedList neighbours = new LinkedList();
                 if (y - 1 >= 0) {
-                    movingMap[x][y].getNeighbours().add(movingMap[x][y - 1]);
+                    movingMap[x][y].getNeighbours()[0] = movingMap[x][y - 1];
                 }
                 if (x + 1 < gridCols) {
-                    movingMap[x][y].getNeighbours().add(movingMap[x + 1][y]);
+                    movingMap[x][y].getNeighbours()[1] = movingMap[x + 1][y];
                 }
                 if (y + 1 < gridRows) {
-                    movingMap[x][y].getNeighbours().add(movingMap[x][y + 1]);
+                    movingMap[x][y].getNeighbours()[2] = movingMap[x][y + 1];
                 }
                 if (x - 1 >= 0) {
-                    movingMap[x][y].getNeighbours().add(movingMap[x - 1][y]);
+                    movingMap[x][y].getNeighbours()[3] = movingMap[x - 1][y];
                 }
-                //movingMap[x][y].setNeighbours(neighbours);
             }
         }
         for (int x = 0; x < gridCols; x++) {
             for (int y = 0; y < gridRows; y++) {
                 System.out.println(x + "," + y + " NodeID:" + movingMap[x][y].getNodeId() + " " + movingMap[x][y].getX() + "," + movingMap[x][y].getY() + " " + movingMap[x][y].blocked);
                 System.out.println("Neighbours:");
-                movingMap[x][y].getNeighbours().print();
+                for (int i = 0; i < movingMap[x][y].getNeighbours().length; i++) {
+                    System.out.println(movingMap[x][y].getNeighbours()[i]);
+                }
             }
         }
         System.out.println("Finish PathFinder");
         System.out.println("SNode " + start.getX() + "," + start.getY() + " GNode " + goal.getX() + "," + goal.getY());
-        //return astar.findPath(start, goal);
-        //}
-        return null;
-//        try {
-//            boolean pathFound = false;
-//            LinkedList openList = new LinkedList();
-//            LinkedList closedList = new LinkedList();
-//            int startX = selectedUnit.getX() / 24;
-//            int startY = selectedUnit.getY() / 24;
-//            openList.addFirst(new Node(new Cell(startX, startY, false), x, y));
-//
-//            Node currentNode;
-//            do {
-//                currentNode = openList.getMinFScore();
-//                //currentNode.computeScore(null, x, y);
-//                System.out.println("FScore" + currentNode.fScore + "HScore" + currentNode.hScore);
-//                startX = currentNode.data.getX();
-//                startY = currentNode.data.getY();
-//                closedList.addFirst(currentNode);
-//                openList.remove(currentNode);
-//                if (closedList.contains(new Cell(x, y)) >= 0) {
-//                    pathFound = true;
-//                    break;
-//                }
-//                LinkedList adjacentList = new LinkedList();
-//                if (backgroundLayer.getCell(startX, startY - 1) < 10) {
-//                    adjacentList.addFirst(new Node(new Cell(startX, startY - 1, true), x, y));
-//                }
-//                if (backgroundLayer.getCell(startX - 1, startY) < 10) {
-//                    adjacentList.addFirst(new Node(new Cell(startX - 1, startY, true), x, y));
-//                }
-//                if (backgroundLayer.getCell(startX, startY + 1) < 10) {
-//                    adjacentList.addFirst(new Node(new Cell(startX, startY + 1, true), x, y));
-//                }
-//                if (backgroundLayer.getCell(startX + 1, startY) < 10) {
-//                    adjacentList.addFirst(new Node(new Cell(startX + 1, startY, true), x, y));
-//                }
-//                Node traversalNode = adjacentList.head;
-//                while (traversalNode != null) {
-//                    if (closedList.contains(traversalNode.data) >= 0) {
-//                        traversalNode = traversalNode.next;
-//                        continue;
-//                    }
-//                    if (openList.contains(traversalNode.data) < 0) {
-//                        traversalNode.computeScore(currentNode, x, y);
-//                        openList.addFirst(traversalNode);
-//                    } else {
-//                        System.out.println("current gScore " + currentNode.gScore + " traversalNode gScore " + traversalNode.gScore);
-//                        if (currentNode.gScore + 1 < traversalNode.gScore) {
-//                            traversalNode.gScore = currentNode.gScore + 1;
-//                            openList.remove(traversalNode);
-//                            openList.addFirst(traversalNode);
-//                        }
-//                    }
-//                    traversalNode = traversalNode.next;
-//                }
-//                
-//            } while (!openList.isEmpty());
-//            if (pathFound) {
-//                Node current = closedList.head;
-//                int c = 1;
-//                while (current != null) {
-//                    System.out.println("Step " + c + " (" + current.data.getX() + "," + current.data.getY() + ")");
-//                    c++;
-//                    current = current.next;
-//                }
-//            }
-//        } catch (Exception e) {
-//            e.printStackTrace();
-//        }
+        return astar.findPath(start, goal);
     }
 
     public Unit getPLUnit(int x, int y) {

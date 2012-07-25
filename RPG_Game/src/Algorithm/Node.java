@@ -13,7 +13,8 @@ public class Node implements Comparable {
     public Cell data;
     public Node next, prev;
     public Node parent;
-    public LinkedList neighbours;
+    //public LinkedList neighbours;
+    public Node[] neighbours;
     public int nodeID, gScore, hScore, visitOrder;
     public boolean blocked, visited, partOfPath;
 
@@ -24,7 +25,12 @@ public class Node implements Comparable {
         next = null;
         parent = null;
         prev = null;
-        neighbours = new LinkedList();
+        //neighbours = new LinkedList();
+        neighbours = new Node[4];
+    }
+
+    public Node(Node node) {
+    
     }
 
     public Node getParent() {
@@ -35,13 +41,22 @@ public class Node implements Comparable {
         this.parent = parent;
     }
 
-    public LinkedList getNeighbours() {
+    public Node[] getNeighbours() {
         return neighbours;
     }
 
-    public void setNeighbours(LinkedList neighbours) {
+    public void setNeighbours(Node[] neighbours) {
         this.neighbours = neighbours;
     }
+
+    
+//    public LinkedList getNeighbours() {
+//        return neighbours;
+//    }
+//
+//    public void setNeighbours(LinkedList neighbours) {
+//        this.neighbours = neighbours;
+//    }
 
     public int getNodeId() {
         return nodeID;

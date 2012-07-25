@@ -8,42 +8,122 @@ package Algorithm;
  *
  * @author kem
  */
-public class Node {
+public class Node implements Comparable {
 
     public Cell data;
-    public Node next;
+    public Node next, prev;
     public Node parent;
-    public int fScore, gScore, hScore;
+    public LinkedList neighbours;
+    public int nodeID, gScore, hScore, visitOrder;
+    public boolean blocked, visited, partOfPath;
 
-    public Node(Cell data) {
+    public Node(Cell data, int nodeID) {
         this.data = data;
+        this.blocked = data.getCanMove();
+        this.nodeID = nodeID;
         next = null;
         parent = null;
+        prev = null;
+        neighbours = new LinkedList();
     }
 
-    public Node(Cell cell, int x2, int y2) {
-        data = cell;
-        next = null;
-        parent = null;
-        hScore = Math.abs(cell.getX() - x2) + Math.abs(cell.getY() - y2);
-        gScore = 0;
-        fScore = hScore + gScore;
-
+    public Node getParent() {
+        return parent;
     }
 
-    public Node(Cell cell, int x2, int y2, int score) {
-        data = cell;
-        next = null;
+    public void setParent(Node parent) {
+        this.parent = parent;
+    }
+
+    public LinkedList getNeighbours() {
+        return neighbours;
+    }
+
+    public void setNeighbours(LinkedList neighbours) {
+        this.neighbours = neighbours;
+    }
+
+    public int getNodeId() {
+        return nodeID;
+    }
+
+    public boolean isBlocked() {
+        return blocked;
+    }
+
+    public void setBlocked(boolean blocked) {
+        this.blocked = blocked;
+    }
+
+    public boolean isVisited() {
+        return visited;
+    }
+
+    public void setVisitOrder(int visitOrder) {
+        this.visitOrder = visitOrder;
+    }
+
+    public void setVisited(boolean visited) {
+        this.visited = visited;
+    }
+
+    public int getVisitOrder() {
+        return visitOrder;
+    }
+
+    public boolean isPartOfPath() {
+        return partOfPath;
+    }
+
+    public void setPartOfPath(boolean partOfPath) {
+        this.partOfPath = partOfPath;
+    }
+
+    public int getEstimatedCostFromStartToGoal() {
+        return hScore + gScore;
+    }
+
+    public void reset() {
+        visited = false;
+        visitOrder = 0;
         parent = null;
+        partOfPath = false;
         hScore = 0;
-        gScore = score++;
-        fScore = hScore + gScore;
     }
 
-    public void computeScore(Node node, int x, int y) {
-        parent = node;
-        hScore = Math.abs(node.data.getX() - x) + Math.abs(node.data.getY() - y);
-        gScore = node.gScore++;
-        fScore = hScore + gScore;
+    public String toString() {
+        return "[Node " + nodeID + " " + getX() + "," + getY() + " (" + (blocked ? " " : "X") + ")]";
+    }
+
+    public int getX() {
+        return this.data.getX();
+    }
+
+    public int getY() {
+        return this.data.getY();
+    }
+
+    public int getEstimatedCostTo(Node start, Node goal) {
+        int estimatecost = Math.abs(start.getX() - goal.getX()) + Math.abs(start.getY() - goal.getY());
+        return estimatecost;
+    }
+
+    public int getCost() {
+        return 1;
+    }
+
+    public int compareTo(Object o) {
+        return (((Node) o).data.getX() == this.data.getX() && ((Node) o).data.getY() == this.data.getY()) ? 0 : 1;
+    }
+
+    public int compareCost(Node n) {
+        int cost = this.getEstimatedCostFromStartToGoal() - n.getEstimatedCostFromStartToGoal();
+        if (cost > 0) {
+            return 1;
+        } else if (cost < 0) {
+            return -1;
+        } else {
+            return 0;
+        }
     }
 }

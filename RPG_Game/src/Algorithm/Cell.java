@@ -7,9 +7,7 @@ package Algorithm;
 public class Cell {
 
     private int x, y;
-    private int col, row;
-    Cell[] neighbors;
-    Cell pathParent;
+    LinkedList neighbours;
     private boolean canMove;
 
     public Cell(int x, int y) {
@@ -22,7 +20,8 @@ public class Cell {
         this.x = x;
         this.y = y;
         this.canMove = isBlock;
-    }   
+        
+    } 
 
     public int getX() {
         return x;

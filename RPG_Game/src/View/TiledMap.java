@@ -193,6 +193,7 @@ class GameCanvasTiledLayerDemo extends GameCanvas implements Runnable {
                 if (!(j == space && i == space) && ((i <= space) && (j >= space - i) && (j <= space + i) || ((i > space) && (j >= i - space) && (j < space * 2 + 1 - i + space)))) {
                     int a = j + col - space, b = i + row - space;
                     if (a >= 0 && b >= 0 && a < 25 && b < 15) {
+                        //System.out.println("Cell  "+a+","+b);
                         counter++;
                         if (backgroundLayer.getCell(a, b) < 10) {
                             if (getPLUnit(a * 24, b * 24) == null) {

@@ -16,7 +16,6 @@ public interface Unit {
 
     public Sprite getSprite();
     public int getX();
-
     public int getY();
 
     public int getMoveSpace();
@@ -28,6 +27,8 @@ public interface Unit {
     public void endTurn(LayerManager lManager, Image image);
 
     public void newTurn(LayerManager lManager);
+    
+    public void beAttacked(Unit attacker);
 
     public void isDead(LayerManager lManager, Image image);
 
@@ -36,4 +37,8 @@ public interface Unit {
     public void setEndTurn(boolean endTurn);
 
     public Attackable getAttackType();
+    
+    public int getAttack();
+    
+    public int getHealth();
 }

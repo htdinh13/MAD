@@ -16,6 +16,7 @@ import Unit.AIUnit;
 import Unit.PlayerUnit;
 import Unit.Unit;
 import java.io.IOException;
+import javax.microedition.lcdui.Canvas;
 import javax.microedition.lcdui.Graphics;
 import javax.microedition.lcdui.Image;
 import javax.microedition.lcdui.game.GameCanvas;
@@ -62,7 +63,7 @@ public class RPGMap extends GameCanvas implements Runnable {
     int gridCols, gridRows;
     Node start, goal;
     AStar astar;
-    LinkedList path;
+    LinkedList path, openList, closedList;
 
     public void loadImages() throws IOException {
         images = new Image[21];
@@ -234,11 +235,18 @@ public class RPGMap extends GameCanvas implements Runnable {
         movingLayer.setPosition((col - space) * 24, (row - space) * 24);
 //        removeUnmoveableCell(space);
         lManager.insert(movingLayer, 28);
-        
+
         System.out.println("CREATING MOVING CELL");
         return movingCells;
     }
-    LinkedList openList, closedList;
+
+    public void resetMovingCells() {
+        for (int x_ = 0; x_ < gridCols; x_++) {
+            for (int y_ = 0; y_ < gridRows; y_++) {
+                movingCells[x_][y_].reset();
+            }
+        }
+    }
 
     public LinkedList move(int goalX, int goalY) {
         int x_ = goalX / 24, y_ = goalY / 24;
@@ -358,11 +366,9 @@ public class RPGMap extends GameCanvas implements Runnable {
                         }
                     }
                 }
-                System.out.println("OnSelected " + onSelected + " IsMoving " + isMoving + " IsAttacking " + isAttacking + " IsMoved " + isMoved);
                 break;
             case KEY_STAR:
                 break;
-
             default:
                 break;
         }
@@ -531,27 +537,17 @@ public class RPGMap extends GameCanvas implements Runnable {
                     if (!isMoved) {
                         // Change to moved state (can undo)
                         try {
-                            if (path != null) {
-                                path.clear();
-                            }
+                            resetMovingCells();
+                            openList.clear();
+                            closedList.clear();
                             path = move(cursorSpr.getX(), cursorSpr.getY());
                         } catch (Exception ex) {
                             ex.printStackTrace();
                         }
-                        System.out.println("Finish Finding");
                         if (selectedUnit.move(this, cursorSpr, lManager, path, images[11])) {
-                            //selectedUnit.move(cursorSpr.getX_(), cursorSpr.getY_());
                             selectedSpr.setVisible(false);
                             movingLayer.setVisible(false);
                             isMoved = true;
-//                        movedSpr = new Sprite(images[11], 22, 14);
-//                        movedSpr.setFrame(1);
-//                        if (cursorSpr.getY_() == 0) {
-//                            movedSpr.setPosition(cursorSpr.getX_() + 1, cursorSpr.getY_() + 24);
-//                        } else {
-//                            movedSpr.setPosition(cursorSpr.getX_() + 1, cursorSpr.getY_() - 14);
-//                        }
-//                        lManager.insert(movedSpr, 3);
                         }
                     } else {
                         if (!isAttacking) {
@@ -577,14 +573,15 @@ public class RPGMap extends GameCanvas implements Runnable {
                                 selectedUnit.getAttackType().start();
 
                                 //Attacking
-                                attacked.isDead(lManager, images[8]);
+                                if (attacked.getHealth() <= 0) {
+                                    attacked.isDead(lManager, images[8]);
+                                }
                                 unitEndTurned();
                             }
                         }
                     }
                 }
             }
-            System.out.println("OnSelected " + onSelected + " IsMoving " + isMoving + " IsAttacking " + isAttacking + " IsMoved " + isMoved);
         }
         if (!onSelected) {
             cursorSpr.move(action);

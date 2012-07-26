@@ -14,8 +14,7 @@ import javax.microedition.midlet.MIDletStateChangeException;
 
 public class TiledMap extends MIDlet implements CommandListener {
 
-    private Display mDisplay;
-    
+    private Display mDisplay;    
 
     protected void destroyApp(boolean unconditional) throws MIDletStateChangeException {
     }
@@ -34,4 +33,3 @@ public class TiledMap extends MIDlet implements CommandListener {
         throw new UnsupportedOperationException("Not supported yet.");
     }
 }
-

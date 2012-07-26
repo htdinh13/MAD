@@ -32,6 +32,7 @@ public abstract class AttackAbstract implements Attackable, Runnable {
     }
 
     public void attack(Unit attacker, Unit attacked) {
+        attacked.beAttacked(attacker);
         attackSpr.setVisible(true);
         attackSpr.setPosition(attacked.getX() - 4, attacked.getY() - 4);
         lManager.insert(attackSpr, 0);

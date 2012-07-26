@@ -58,9 +58,7 @@ public class AStar {
     }
 
     public LinkedList findPath(Node start, Node goal) {
-        this.reset();
-        open.print();
-        closed.print();
+        //this.reset();
         this.start = start;
         this.goal = goal;
         return startSearch(start, goal);
@@ -100,8 +98,6 @@ public class AStar {
                         }
                     }
                 }
-                System.out.println("=====OPEN LIST=====");
-                open.print();
                 closed.add(node);
             }
         }

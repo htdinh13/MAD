@@ -3,6 +3,9 @@ package Unit;
 import Algorithm.LinkedList;
 import Algorithm.Node;
 import Attack.Attackable;
+import Attack.CavalryAttack;
+import Attack.KnightAttack;
+import Attack.RangedAttack;
 import View.Cursor;
 import View.RPGMap;
 import javax.microedition.lcdui.Image;
@@ -16,10 +19,10 @@ import javax.microedition.lcdui.game.Sprite;
 public abstract class UnitAbstract implements Unit {
 
     private Sprite sprite, endSprite, deadSprite;
-    private int x, y, moveSpace;
+    private int x, y;
     private boolean endTurn;
     private Attackable attackType;
-    // private LayerManager lManager;
+    public int health, attack, defence, moveSpace;
 
     public UnitAbstract(int colnum, int rownum, Image img, int moveSpace, Attackable attackType) {
         this.x = colnum * 24;
@@ -30,6 +33,34 @@ public abstract class UnitAbstract implements Unit {
         sprite.setPosition(x, y);
         endTurn = false;
         this.attackType = attackType;
+        if (attackType instanceof KnightAttack) {
+            this.health = 60;
+            this.attack = 5;
+            this.defence = 15;
+        } else if (attackType instanceof RangedAttack) {
+            this.health = 40;
+            this.attack = 10;
+            this.defence = 5;
+        } else if (attackType instanceof CavalryAttack) {
+            this.health = 80;
+            this.attack = 15;
+            this.defence = 10;
+        }
+    }
+
+    public UnitAbstract(int x, int y, Image img, int moveSpace, Attackable attackType, int health, int attack, int defence) {
+        this.x = x * 24;
+        this.y = y * 24;
+        this.moveSpace = moveSpace;
+        sprite = new Sprite(img, 24, 24);
+        sprite.setVisible(true);
+        sprite.setPosition(x, y);
+        endTurn = false;
+        this.attackType = attackType;
+
+        this.health = health;
+        this.attack = attack;
+        this.defence = defence;
     }
 
     public int getX() {
@@ -54,6 +85,14 @@ public abstract class UnitAbstract implements Unit {
 
     public int getMoveSpace() {
         return moveSpace;
+    }
+
+    public int getAttack() {
+        return attack;
+    }
+
+    public int getHealth() {
+        return health;
     }
 
     public Sprite getSprite() {
@@ -154,5 +193,15 @@ public abstract class UnitAbstract implements Unit {
             }
         });
         t.start();
+    }
+
+    public void beAttacked(Unit attacker) {
+        if ((attacker.getAttackType() instanceof KnightAttack && this.getAttackType() instanceof RangedAttack)
+                || (attacker.getAttackType() instanceof CavalryAttack && this.getAttackType() instanceof KnightAttack)
+                || (attacker.getAttackType() instanceof RangedAttack && this.getAttackType() instanceof CavalryAttack)) {
+            this.health -= attacker.getAttack() * 1.2 - this.defence;
+        } else {
+            this.health -= attacker.getAttack() - this.defence;
+        }
     }
 }

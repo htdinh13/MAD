@@ -22,7 +22,7 @@ public interface Unit {
 
     public int getMoveSpace();
 
-    public boolean move(RPGMap map, Cursor cursor, final LayerManager lManager, LinkedList path, Image image);
+    public boolean move(RPGMap map, LinkedList path);
 
     public void move(int x, int y);
 

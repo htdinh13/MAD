@@ -35,8 +35,8 @@ public class RPGMap extends GameCanvas implements Runnable {
     public Cursor cursorSpr;
     private Sprite selectedSpr;
     public Sprite movedSpr;
-    private Unit[] ai_units, pl_units;
-    private TiledLayer backgroundLayer, movingLayer, attackingLayer;
+    public Unit[] ai_units, pl_units;
+    public TiledLayer backgroundLayer, movingLayer, attackingLayer;
     public LayerManager lManager;
     private final int cells[][] = {
         {4, 4, 4, 4, 4, 17, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 3, 3, 3, 3, 3, 3, 3, 3},
@@ -200,7 +200,6 @@ public class RPGMap extends GameCanvas implements Runnable {
         gridRows = space * 2 + 1;
         movingLayer = new TiledLayer((gridCols), gridRows, images[10], 24, 24);
         movingCells = new Node[gridCols][gridRows];
-        int counter = 0;
         for (int i = 0; i < gridCols; i++) {
             for (int j = 0; j < gridRows; j++) {
                 int a = i + col - space, b = j + row - space;
@@ -210,28 +209,27 @@ public class RPGMap extends GameCanvas implements Runnable {
                             if (getPLUnit(a * 24, b * 24) == null) {
                                 if (getAIUnit(a * 24, b * 24) == null) {
                                     movingLayer.setCell(i, j, 2);
-                                    movingCells[i][j] = new Node(new Cell(a, b), counter);
+                                    movingCells[i][j] = new Node(new Cell(a, b));
                                 } else {
-                                    movingCells[i][j] = new Node(new Cell(a, b, false), counter);
+                                    movingCells[i][j] = new Node(new Cell(a, b, false));
                                 }
                             } else {
-                                movingCells[i][j] = new Node(new Cell(a, b), counter);
+                                movingCells[i][j] = new Node(new Cell(a, b));
                             }
                         } else {
-                            movingCells[i][j] = new Node(new Cell(a, b, false), counter);
+                            movingCells[i][j] = new Node(new Cell(a, b, false));
                         }
                     } else {
-                        movingCells[i][j] = new Node(new Cell(a, b, false), counter);
+                        movingCells[i][j] = new Node(new Cell(a, b, false));
                     }
                 } else {
                     if (j == space && i == space) {
-                        movingCells[i][j] = new Node(new Cell(a, b), counter);
+                        movingCells[i][j] = new Node(new Cell(a, b));
                         start = movingCells[i][j];
                     } else {
-                        movingCells[i][j] = new Node(new Cell(a, b, false), counter);
+                        movingCells[i][j] = new Node(new Cell(a, b, false));
                     }
                 }
-                counter++;
             }
         }
         for (int x = 0; x < gridCols; x++) {
@@ -252,6 +250,59 @@ public class RPGMap extends GameCanvas implements Runnable {
         }
         movingLayer.setPosition((col - space) * 24, (row - space) * 24);
         lManager.insert(movingLayer, lManager.getSize() - 1);
+        return movingCells;
+    }
+
+    public Node[][] createAIMovingNodes(int col, int row, int space) {
+        int _gridCols = space * 2 + 1;
+        int _gridRows = space * 2 + 1;
+        Node[][] movingCells = new Node[_gridCols][_gridRows];
+        for (int i = 0; i < _gridCols; i++) {
+            for (int j = 0; j < _gridRows; j++) {
+                int a = i + col - space, b = j + row - space;
+                if (!(j == space && i == space) && ((i <= space) && (j >= space - i) && (j <= space + i) || ((i > space) && (j >= i - space) && (j < space * 2 + 1 - i + space)))) {
+                    if (a >= 0 && b >= 0 && a < 25 && b < 15) {
+                        if (backgroundLayer.getCell(a, b) < 10) {
+                            if (getAIUnit(a * 24, b * 24) == null) {
+                                if (getPLUnit(a * 24, b * 24) == null) {
+                                    movingCells[i][j] = new Node(new Cell(a, b));
+                                } else {
+                                    movingCells[i][j] = new Node(new Cell(a, b, false));
+                                }
+                            } else {
+                                movingCells[i][j] = new Node(new Cell(a, b));
+                            }
+                        } else {
+                            movingCells[i][j] = new Node(new Cell(a, b, false));
+                        }
+                    } else {
+                        movingCells[i][j] = new Node(new Cell(a, b, false));
+                    }
+                } else {
+                    if (j == space && i == space) {
+                        movingCells[i][j] = new Node(new Cell(a, b));
+                    } else {
+                        movingCells[i][j] = new Node(new Cell(a, b, false));
+                    }
+                }
+            }
+        }
+        for (int x = 0; x < _gridCols; x++) {
+            for (int y = 0; y < _gridRows; y++) {
+                if (y - 1 >= 0) {
+                    movingCells[x][y].getNeighbours()[0] = movingCells[x][y - 1];
+                }
+                if (x + 1 < _gridCols) {
+                    movingCells[x][y].getNeighbours()[1] = movingCells[x + 1][y];
+                }
+                if (y + 1 < _gridRows) {
+                    movingCells[x][y].getNeighbours()[2] = movingCells[x][y + 1];
+                }
+                if (x - 1 >= 0) {
+                    movingCells[x][y].getNeighbours()[3] = movingCells[x - 1][y];
+                }
+            }
+        }
         return movingCells;
     }
 
@@ -294,7 +345,7 @@ public class RPGMap extends GameCanvas implements Runnable {
 
     public LinkedList move(int goalX, int goalY) {
         int x_ = goalX / 24, y_ = goalY / 24;
-        goal = new Node(new Cell(x_, y_), -1);
+        goal = new Node(new Cell(x_, y_));
         return astar.findPath(start, goal);
     }
 
@@ -363,7 +414,7 @@ public class RPGMap extends GameCanvas implements Runnable {
                         selectedUnit = getPLUnit(cursorSpr.getX_(), cursorSpr.getY_());
                     }
                     if (selectedUnit != null && !selectedUnit.getEndTurn()) {
-                            createMovingLayer(selectedUnit);
+                        createMovingLayer(selectedUnit);
                     }
                 }
                 break;
@@ -578,7 +629,7 @@ public class RPGMap extends GameCanvas implements Runnable {
                                 ex.printStackTrace();
                             }
                         }
-                        if (selectedUnit.move(this, cursorSpr, lManager, path, images[11])) {
+                        if (selectedUnit.move(this, path)) {
                             path = null;
                             selectedSpr.setVisible(false);
                             movingLayer.setVisible(false);
@@ -727,7 +778,6 @@ public class RPGMap extends GameCanvas implements Runnable {
                 break;
             }
             animationUnits();
-//            keyPressed();
             drawLayer();
             try {
                 Thread.sleep(175);

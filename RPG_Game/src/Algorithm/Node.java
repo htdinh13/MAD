@@ -1,4 +1,3 @@
-
 package Algorithm;
 
 public class Node implements Comparable {
@@ -7,13 +6,12 @@ public class Node implements Comparable {
     public Node next, prev;
     public Node parent;
     public Node[] neighbours;
-    public int nodeID, costFromStart, estimatedCostToGoal, visitOrder;
-    public boolean blocked, visited, partOfPath;
+    public int costFromStart, estimatedCostToGoal;
+    public boolean blocked, visited;
 
-    public Node(Cell data, int nodeID) {
+    public Node(Cell data) {
         this.data = data;
         this.blocked = !data.getCanMove();
-        this.nodeID = nodeID;
         next = null;
         parent = null;
         prev = null;
@@ -38,10 +36,6 @@ public class Node implements Comparable {
         this.neighbours = neighbours;
     }
 
-    public int getNodeId() {
-        return nodeID;
-    }
-
     public boolean isBlocked() {
         return blocked;
     }
@@ -54,24 +48,8 @@ public class Node implements Comparable {
         return visited;
     }
 
-    public void setVisitOrder(int visitOrder) {
-        this.visitOrder = visitOrder;
-    }
-
     public void setVisited(boolean visited) {
         this.visited = visited;
-    }
-
-    public int getVisitOrder() {
-        return visitOrder;
-    }
-
-    public boolean isPartOfPath() {
-        return partOfPath;
-    }
-
-    public void setPartOfPath(boolean partOfPath) {
-        this.partOfPath = partOfPath;
     }
 
     public int getEstimatedCostFromStartToGoal() {
@@ -82,14 +60,12 @@ public class Node implements Comparable {
         next = null;
         prev = null;
         visited = false;
-        visitOrder = 0;
         parent = null;
-        partOfPath = false;
         estimatedCostToGoal = 0;
     }
 
     public String toString() {
-        return "[Node " + nodeID + " " + getX() + "," + getY() + " (" + (blocked ? "X" : " ") + ")]" + " Visisted " + visited + "Parrent " + ((parent != null) ? "" + parent : "null");
+        return "[Node " + getX() + "," + getY() + " (" + (blocked ? "X" : " ") + ")]" + " Visisted " + visited + "Parrent " + ((parent != null) ? "" + parent : "null");
     }
 
     public int getX() {

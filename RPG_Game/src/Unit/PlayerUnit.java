@@ -2,10 +2,8 @@ package Unit;
 
 import Algorithm.LinkedList;
 import Attack.Attackable;
-import View.Cursor;
 import View.RPGMap;
 import javax.microedition.lcdui.Image;
-import javax.microedition.lcdui.game.LayerManager;
 
 /**
  *
@@ -35,10 +33,10 @@ public class PlayerUnit extends UnitAbstract {
         (super.getSprite()).setPosition(x, y);
     }
 
-    public boolean move(final RPGMap map, final Cursor cursor, final LayerManager lManager, final LinkedList path, final Image image) {
+    public boolean move(final RPGMap map,final LinkedList path) {
         this.preX = super.getX();
         this.preY = super.getY();
-        return super.move(map, cursor, lManager, path, image);
+        return super.move(map, path);
     }
 
     public void unmove() {

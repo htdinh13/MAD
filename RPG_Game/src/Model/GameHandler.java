@@ -1,17 +1,9 @@
-/*
- * To change this template, choose Tools | Templates
- * and open the template in the editor.
- */
 package Model;
 
 import Unit.AIUnit;
 import Unit.Unit;
 import View.RPGMap;
 
-/**
- *
- * @author kem
- */
 public class GameHandler implements Runnable {
 
     private boolean playerTurn;
@@ -61,10 +53,6 @@ public class GameHandler implements Runnable {
         return true;
     }
 
-    public void swithchTurnBase() {
-        playerTurn = !playerTurn;
-    }
-
     public void newTurnAllUnits() {
         for (int i = 0; i < aiUnits.length; i++) {
             if (aiUnits[i] != null && aiUnits[i].getHealth() > 0) {
@@ -89,28 +77,33 @@ public class GameHandler implements Runnable {
         map.cursorSpr.setVisible(false);
         newTurnAllUnits();
         for (int i = 0; i < aiUnits.length; i++) {
+            //pleaseWait = true;
             if (aiUnits[i] != null && aiUnits[i].getHealth() > 0) {
                 map.setActiveView(aiUnits[i].getX(), aiUnits[i].getY());
-                ((AIUnit) aiUnits[i]).live(map.lManager, map.images[3]);
+//                ((AIUnit) aiUnits[i]).live(map.lManager, map.images[3]);
                 try {
                     Thread.sleep(100);
                 } catch (InterruptedException ex) {
                     ex.printStackTrace();
                 }
             }
+            playerTurn = true;
         }
-        playerTurn = true;
+        //public boolean pleaseWait = true;
     }
 
     public void run() {
         while (true) {
+
             if (playerTurn) {
                 this.PLTurn();
                 while (!checkAllUnitEndTurn(plUnits)) {
                 }
-                swithchTurnBase();
+                playerTurn = false;
             } else {
+                System.out.println("AITURN");
                 this.AITurn();
+
             }
         }
     }

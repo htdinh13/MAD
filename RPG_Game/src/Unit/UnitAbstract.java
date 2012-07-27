@@ -118,19 +118,20 @@ public abstract class UnitAbstract implements Unit {
     public void move(int x, int y) {
         this.x = x;
         this.y = y;
+        sprite.setPosition(x, y);
     }
 
-    public boolean move(final RPGMap map, final Cursor cursor, final LayerManager lManager, final LinkedList path, final Image image) {
+    public boolean move(final RPGMap map, final LinkedList path) {
         if (path != null) {
             Thread t = new Thread(new Runnable() {
 
                 public void run() {
-                    synchronized (lManager) {
+                    synchronized (map.lManager) {
                         Node n = path.head;
                         while (n != null) {
                             x = n.getX() * 24;
                             y = n.getY() * 24;
-                            cursor.move(x, y);
+                            map.cursorSpr.move(x, y);
                             map.setActiveView(x, y);
                             sprite.setPosition(x, y);
                             n = n.next;
@@ -140,14 +141,14 @@ public abstract class UnitAbstract implements Unit {
                                 ex.printStackTrace();
                             }
                         }
-                        map.movedSpr = new Sprite(image, 22, 14);
+                        map.movedSpr = new Sprite(map.images[11], 22, 14);
                         map.movedSpr.setFrame(0);
-                        if (cursor.getY_() == 0) {
-                            map.movedSpr.setPosition(cursor.getX_() + 1, cursor.getY_() + 24);
+                        if (map.cursorSpr.getY_() == 0) {
+                            map.movedSpr.setPosition(map.cursorSpr.getX_() + 1, map.cursorSpr.getY_() + 24);
                         } else {
-                            map.movedSpr.setPosition(cursor.getX_() + 1, cursor.getY_() - 14);
+                            map.movedSpr.setPosition(map.cursorSpr.getX_() + 1, map.cursorSpr.getY_() - 14);
                         }
-                        lManager.insert(map.movedSpr, 3);
+                        map.lManager.insert(map.movedSpr, 3);
                     }
                 }
             });

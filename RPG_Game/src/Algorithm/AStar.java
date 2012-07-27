@@ -19,7 +19,6 @@ public class AStar {
         LinkedList path = new LinkedList();
 
         while (node.getParent() != null) {
-            node.setPartOfPath(true);
             path.addFirst(node);
             node = node.getParent();
         }
@@ -61,11 +60,9 @@ public class AStar {
         start.estimatedCostToGoal = start.getEstimatedCostTo(goal);
         start.costFromStart = 0;
         open.add(start);
-        int order = 0;
         while (!open.isEmpty()) {
             Node node = open.removeFirst();
             node.setVisited(true);
-            node.setVisitOrder(order++);
 
             if (node.compareTo(goal) == 0) {
                 return constructPath(node);

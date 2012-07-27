@@ -35,22 +35,22 @@ public abstract class UnitAbstract implements Unit {
         this.attackType = attackType;
         if (attackType instanceof KnightAttack) {
             this.health = 60;
-            this.attack = 5;
+            this.attack = 20;
             this.defence = 15;
         } else if (attackType instanceof RangedAttack) {
             this.health = 40;
-            this.attack = 10;
+            this.attack = 25;
             this.defence = 5;
         } else if (attackType instanceof CavalryAttack) {
             this.health = 80;
-            this.attack = 15;
+            this.attack = 30;
             this.defence = 10;
         }
     }
 
-    public UnitAbstract(int x, int y, Image img, int moveSpace, Attackable attackType, int health, int attack, int defence) {
-        this.x = x * 24;
-        this.y = y * 24;
+    public UnitAbstract(int colnum, int rownum, Image img, int moveSpace, Attackable attackType, int health, int attack, int defence) {
+        this.x = colnum * 24;
+        this.y = rownum * 24;
         this.moveSpace = moveSpace;
         sprite = new Sprite(img, 24, 24);
         sprite.setVisible(true);
@@ -143,7 +143,7 @@ public abstract class UnitAbstract implements Unit {
                         }
 
                         map.movedSpr = new Sprite(image, 22, 14);
-                        map.movedSpr.setFrame(1);
+                        map.movedSpr.setFrame(0);
                         if (cursor.getY_() == 0) {
                             map.movedSpr.setPosition(cursor.getX_() + 1, cursor.getY_() + 24);
                         } else {
@@ -193,6 +193,8 @@ public abstract class UnitAbstract implements Unit {
             }
         });
         t.start();
+        x = -1;
+        y = -1;
     }
 
     public void beAttacked(Unit attacker) {

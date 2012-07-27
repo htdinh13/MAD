@@ -7,9 +7,6 @@ package Algorithm;
 public class Cell {
 
     private int x, y;
-    private int col, row;
-    Cell[] neighbors;
-    Cell pathParent;
     private boolean canMove;
 
     public Cell(int x, int y) {

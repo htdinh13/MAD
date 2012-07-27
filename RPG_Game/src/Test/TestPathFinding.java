@@ -243,7 +243,6 @@ class TestPathFindingMap extends GameCanvas implements Runnable {
         for (int i = 0; i < gridCols; i++) {
             for (int j = 0; j < gridRows; j++) {
                 int a = i + col - space, b = j + row - space;
-                System.out.println(a + "," + b);
                 if (!(j == space && i == space) && ((i <= space) && (j >= space - i) && (j <= space + i) || ((i > space) && (j >= i - space) && (j < space * 2 + 1 - i + space)))) {
                     if (a >= 0 && b >= 0 && a < 25 && b < 15) {
                         if (backgroundLayer.getCell(a, b) < 10) {
@@ -325,7 +324,7 @@ class TestPathFindingMap extends GameCanvas implements Runnable {
     }
 
     public void createAIUnits() {
-        ai_units[0] = new AIUnit(1, 7, images[14], 5, new CavalryAttack(images[5], lManager));
+        ai_units[0] = new AIUnit(3, 4, images[14], 5, new CavalryAttack(images[5], lManager));
         ai_units[1] = new AIUnit(10, 3, images[14], 5, new CavalryAttack(images[5], lManager));
         ai_units[2] = new AIUnit(11, 2, images[14], 5, new CavalryAttack(images[5], lManager));
         ai_units[3] = new AIUnit(11, 3, images[14], 5, new CavalryAttack(images[5], lManager));
@@ -359,8 +358,8 @@ class TestPathFindingMap extends GameCanvas implements Runnable {
         pl_units[0] = new PlayerUnit(2, 2, images[16], 5, new CavalryAttack(images[5], lManager));
         pl_units[1] = new PlayerUnit(3, 3, images[18], 4, new KnightAttack(images[4], lManager));
         pl_units[2] = new PlayerUnit(9, 3, images[20], 3, new RangedAttack(images[6], lManager));
-        pl_units[3] = new PlayerUnit(2, 8, images[17], 5, new CavalryAttack(images[5], lManager));
-        pl_units[4] = new PlayerUnit(12, 3, images[19], 5, new CavalryAttack(images[5], lManager));
+        pl_units[3] = new PlayerUnit(2, 6, images[17], 5, new CavalryAttack(images[5], lManager));
+        pl_units[4] = new PlayerUnit(3, 7, images[19], 5, new CavalryAttack(images[5], lManager));
         for (int i = 0; i < pl_units.length; i++) {
             if (pl_units[i] != null) {
                 lManager.append(pl_units[i].getSprite());

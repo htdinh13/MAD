@@ -76,7 +76,6 @@ public class AStar {
             node.setVisitOrder(order++);
 
             if (node.compareTo(goal) == 0) {
-
                 return constructPath(node);
             } else {
                 for (int i = 0; i < node.getNeighbours().length; i++) {
@@ -86,7 +85,9 @@ public class AStar {
                         boolean inClosed = closed.contains(neighbour);
                         boolean inOpen = open.contains(neighbour);
                         if ((!inOpen && !inClosed) || costFromStart < neighbour.costFromStart) {
-                            neighbour.setParent(node);
+                            if (!neighbour.visited) {
+                                neighbour.setParent(node);
+                            }
                             neighbour.costFromStart = costFromStart;
                             neighbour.estimatedCostToGoal = neighbour.getEstimatedCostTo(goal);
                             if (inClosed) {
@@ -99,6 +100,7 @@ public class AStar {
                     }
                 }
                 closed.add(node);
+//             
             }
         }
         return null;

@@ -128,65 +128,14 @@ public class LinkedList {
         }
         return first;
     }
-
-    public Node getNodeByIndex(int index) {
-        if (index >= 0) {
-            int count = 0;
-            Node current = head;
-            while (current != null) {
-                if (count == index) {
-                    return current;
-                }
-                current = current.next;
-                count++;
-            }
-        }
-        return null;
-    }
-
-    public void addLast(Node node) {
-        final Node l = last;
-        if (head != null) {
-            l.next = node;
-            last = node;
-            last.prev = l;
-        } else {
-            addFirst(node);
-        }
-    }
-
-    public Node removeLast() {
-        final Node l = last;
-        if (l != null) {
-            last = l.prev;
-        }
-        return l;
-    }
-
-//    public Node getMinFScore() {
-//        int minFScore = 375;
-//        Node current = head;
-//        Node minFSNode = null;
-//        while (current != null) {
-//            if (current.fScore < minFScore) {
-//                minFScore = current.fScore;
-//                minFSNode = current;
-//            }
-//            current = current.next;
-//        }
-//        return minFSNode;
-//    }
+    
     public void print() {
         Node current = head;
         int count = 1;
         while (current != null) {
-            System.out.println("\tNode " + count + " (" + current.data.getX() + "," + current.data.getY() + ") H=" + current.estimatedCostToGoal);
+            System.out.println("\tNode " + count + " (" + current.data.getX() + "," + current.data.getY() + ") H=" + current.estimatedCostToGoal+" G="+current.costFromStart);
             current = current.next;
             count++;
         }
-    }
-
-    Iterator iterator() {
-        return new Iterator(this);
     }
 }

@@ -12,11 +12,11 @@ import Attack.Attackable;
 import Attack.CavalryAttack;
 import Attack.KnightAttack;
 import Attack.RangedAttack;
+import Model.GameHandler;
 import Unit.AIUnit;
 import Unit.PlayerUnit;
 import Unit.Unit;
 import java.io.IOException;
-import javax.microedition.lcdui.Canvas;
 import javax.microedition.lcdui.Graphics;
 import javax.microedition.lcdui.Image;
 import javax.microedition.lcdui.game.GameCanvas;
@@ -60,10 +60,12 @@ public class RPGMap extends GameCanvas implements Runnable {
     private boolean onSelected, isMoved, isMoving, isAI, isAttacking;
     private Unit selectedUnit;
     //For PathFinding
-    int gridCols, gridRows;
-    Node start, goal;
-    AStar astar;
-    LinkedList path, openList, closedList;
+    private int gridCols, gridRows;
+    private Node start, goal;
+    private AStar astar;
+    private LinkedList path, openList, closedList;
+    //Game Handler
+    GameHandler game;
 
     public void loadImages() throws IOException {
         images = new Image[21];
@@ -109,6 +111,7 @@ public class RPGMap extends GameCanvas implements Runnable {
 
         createPLUnits();
         createAIUnits();
+        game = new GameHandler(ai_units, pl_units);
 
         this.lManager.insert(cursorSpr, 1);
         this.lManager.insert(backgroundLayer, lManager.getSize());
@@ -118,6 +121,7 @@ public class RPGMap extends GameCanvas implements Runnable {
     }
 
     public void createAIUnits() {
+        ai_units[0] = new AIUnit(3, 4, images[14], 5, new CavalryAttack(images[5], lManager));
         ai_units[0] = new AIUnit(10, 2, images[14], 5, new CavalryAttack(images[5], lManager));
         ai_units[1] = new AIUnit(10, 3, images[14], 5, new CavalryAttack(images[5], lManager));
         ai_units[2] = new AIUnit(11, 2, images[14], 5, new CavalryAttack(images[5], lManager));
@@ -149,11 +153,11 @@ public class RPGMap extends GameCanvas implements Runnable {
     }
 
     public void createPLUnits() {
-        pl_units[0] = new PlayerUnit(2, 2, images[16], 5, new CavalryAttack(images[5], lManager));
-        pl_units[1] = new PlayerUnit(3, 3, images[18], 4, new KnightAttack(images[4], lManager));
-        pl_units[2] = new PlayerUnit(3, 1, images[20], 3, new RangedAttack(images[6], lManager));
-        pl_units[3] = new PlayerUnit(2, 7, images[17], 5, new CavalryAttack(images[5], lManager));
-        pl_units[4] = new PlayerUnit(3, 7, images[19], 5, new CavalryAttack(images[5], lManager));
+        pl_units[0] = new PlayerUnit(2, 2, images[16], 5, new CavalryAttack(images[5], lManager), 120, 40, 15);
+        pl_units[1] = new PlayerUnit(3, 3, images[18], 4, new KnightAttack(images[4], lManager), 150, 30, 20);
+        pl_units[2] = new PlayerUnit(3, 1, images[20], 3, new RangedAttack(images[6], lManager), 80, 35, 10);
+        pl_units[3] = new PlayerUnit(2, 7, images[17], 5, new CavalryAttack(images[5], lManager), 140, 50, 15);
+        pl_units[4] = new PlayerUnit(3, 7, images[19], 5, new CavalryAttack(images[5], lManager), 140, 50, 15);
         for (int i = 0; i < pl_units.length; i++) {
             if (pl_units[i] != null) {
                 lManager.append(pl_units[i].getSprite());
@@ -234,9 +238,7 @@ public class RPGMap extends GameCanvas implements Runnable {
         }
         movingLayer.setPosition((col - space) * 24, (row - space) * 24);
 //        removeUnmoveableCell(space);
-        lManager.insert(movingLayer, 28);
-
-        System.out.println("CREATING MOVING CELL");
+        lManager.insert(movingLayer, lManager.getSize() - 1);
         return movingCells;
     }
 
@@ -406,7 +408,7 @@ public class RPGMap extends GameCanvas implements Runnable {
                         }
                     } else {
                         cursorSpr.move(action);
-                        moveActiveView(action);
+                        moveActiveView(3);
                     }
                 } else {
                     if (isAttacking) {
@@ -420,7 +422,7 @@ public class RPGMap extends GameCanvas implements Runnable {
                     }
                 }
             } else {
-                moveActiveView(action);
+                moveActiveView(3);
             }
         } else if ((action & LEFT_PRESSED) != 0) {
             if (onSelected) {
@@ -437,7 +439,7 @@ public class RPGMap extends GameCanvas implements Runnable {
                         }
                     } else {
                         cursorSpr.move(action);
-                        moveActiveView(action);
+                        moveActiveView(1);
                     }
                 } else {
                     if (isAttacking) {
@@ -451,13 +453,13 @@ public class RPGMap extends GameCanvas implements Runnable {
                     }
                 }
             } else {
-                moveActiveView(action);
+                moveActiveView(1);
             }
         } else if ((action & UP_PRESSED) != 0) {
             if (onSelected) {
                 if (isMoving && !isMoved && !isAttacking) {
                     cursorSpr.move(action);
-                    moveActiveView(action);
+                    moveActiveView(0);
                 } else if (isAttacking) {
                     index = moveAttackCell(2);
                     if (index >= 0) {
@@ -466,14 +468,14 @@ public class RPGMap extends GameCanvas implements Runnable {
                     }
                 }
             } else {
-                moveActiveView(action);
+                moveActiveView(0);
             }
 
         } else if ((action & DOWN_PRESSED) != 0) {
             if (onSelected) {
                 if (isMoving && !isMoved && !isAttacking) {
                     cursorSpr.move(action);
-                    moveActiveView(action);
+                    moveActiveView(2);
                 } else if (isAttacking) {
                     index = moveAttackCell(3);
                     if (index >= 0) {
@@ -483,7 +485,7 @@ public class RPGMap extends GameCanvas implements Runnable {
                 }
             } else {
 
-                moveActiveView(action);
+                moveActiveView(2);
 
             }
         } else if ((action & FIRE_PRESSED) != 0) {
@@ -528,21 +530,25 @@ public class RPGMap extends GameCanvas implements Runnable {
                         if (attacked != null) {
                             selectedUnit.getAttackType().attack(selectedUnit, attacked);
                             selectedUnit.getAttackType().start();
-                            // Attack
-                            attacked.isDead(lManager, images[8]);
+                            // Attack 
+                            if (attacked.getHealth() <= 0) {
+                                attacked.isDead(lManager, images[8]);
+                            }
                             unitEndTurned();
                         }
                     }
                 } else {
                     if (!isMoved) {
                         // Change to moved state (can undo)
-                        try {
-                            resetMovingCells();
-                            openList.clear();
-                            closedList.clear();
-                            path = move(cursorSpr.getX(), cursorSpr.getY());
-                        } catch (Exception ex) {
-                            ex.printStackTrace();
+                        if (getUnit(cursorSpr.getX_(), cursorSpr.getY_()) == null) {
+                            try {
+                                resetMovingCells();
+                                openList.clear();
+                                closedList.clear();
+                                path = move(cursorSpr.getX_(), cursorSpr.getY_());
+                            } catch (Exception ex) {
+                                ex.printStackTrace();
+                            }
                         }
                         if (selectedUnit.move(this, cursorSpr, lManager, path, images[11])) {
                             selectedSpr.setVisible(false);
@@ -569,9 +575,7 @@ public class RPGMap extends GameCanvas implements Runnable {
                             Unit attacked = getAIUnit(cursorSpr.getX_(), cursorSpr.getY_());
                             if (attacked != null) {
                                 selectedUnit.getAttackType().attack(selectedUnit, attacked);
-                                //lManager.insert(selectedUnit.getAttackType().getAttackSpr(), 0);
                                 selectedUnit.getAttackType().start();
-
                                 //Attacking
                                 if (attacked.getHealth() <= 0) {
                                     attacked.isDead(lManager, images[8]);
@@ -652,27 +656,33 @@ public class RPGMap extends GameCanvas implements Runnable {
     }
 
     public void moveActiveView(int action) {
-        if ((action & RIGHT_PRESSED) != 0) {
-            if (x < (600 - this.getWidth()) && cursorSpr.getX_() >= 96) {
-                x += 24;
-            }
-        } else if ((action & LEFT_PRESSED) != 0) {
-            if (x > 0 && cursorSpr.getX_() <= 456) {
-                x -= 24;
-            }
-        } else if ((action & UP_PRESSED) != 0) {
-            if (y > 0 && cursorSpr.getY_() <= 208) {
-                y -= 24;
-            }
-        } else if ((action & DOWN_PRESSED) != 0) {
-            if (y < (312 - this.getWidth()) && cursorSpr.getY_() >= 120) {
-                y += 24;
-            }
+        switch (action) {
+            case 0:
+                if (y > 0 && cursorSpr.getY_() <= 208) {
+                    y -= 24;
+                }
+                break;
+            case 1:
+                if (x > 0 && cursorSpr.getX_() <= 456) {
+                    x -= 24;
+                }
+                break;
+            case 2:
+                if (y < (312 - this.getWidth()) && cursorSpr.getY_() >= 120) {
+                    y += 24;
+                }
+                break;
+            case 3:
+                if (x < (600 - this.getWidth()) && cursorSpr.getX_() >= 96) {
+                    x += 24;
+                }
+                break;
+            default:
+                break;
         }
     }
 
     public void drawLayer() {
-
         Graphics g = this.getGraphics();
         lManager.setViewWindow(x, y, this.getWidth(), this.getHeight() - 3);
         lManager.paint(g, 0, 0);
@@ -686,6 +696,11 @@ public class RPGMap extends GameCanvas implements Runnable {
 
     public void run() {
         while (true) {
+            if (game.checkGameEnd()) {
+                System.out.println("Finish");
+                break;
+            }
+            
             cursorSpr.nextFrame();
             animationUnits();
             keyPressed();
@@ -698,15 +713,13 @@ public class RPGMap extends GameCanvas implements Runnable {
     }
 
     public Unit getUnit(int x, int y) {
-
         Unit unit = getPLUnit(x, y);
         return (unit != null) ? unit : getAIUnit(x, y);
     }
 
     public Unit getPLUnit(int x, int y) {
-
         for (int i = 0; i < pl_units.length; i++) {
-            if (pl_units[i].getX() == x && pl_units[i].getY() == y) {
+            if (pl_units[i] != null && pl_units[i].getX() == x && pl_units[i].getY() == y && pl_units[i].getHealth() > 0) {
                 return pl_units[i];
             }
         }
@@ -715,19 +728,10 @@ public class RPGMap extends GameCanvas implements Runnable {
 
     public Unit getAIUnit(int x, int y) {
         for (int i = 0; i < ai_units.length; i++) {
-            if (ai_units[i].getX() == x && ai_units[i].getY() == y) {
+            if (ai_units[i] != null && ai_units[i].getX() == x && ai_units[i].getY() == y && ai_units[i].getHealth() > 0) {
                 return ai_units[i];
             }
         }
         return null;
-    }
-
-    public boolean endTurn(Unit[] units) {
-        for (int i = 0; i < units.length; i++) {
-            if (!units[i].getEndTurn()) {
-                return false;
-            }
-        }
-        return true;
     }
 }

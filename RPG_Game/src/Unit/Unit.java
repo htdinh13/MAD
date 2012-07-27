@@ -15,19 +15,21 @@ import javax.microedition.lcdui.game.Sprite;
 public interface Unit {
 
     public Sprite getSprite();
+
     public int getX();
+
     public int getY();
 
     public int getMoveSpace();
 
-    public boolean move(RPGMap map,Cursor cursor, final LayerManager lManager, LinkedList path, Image image);
+    public boolean move(RPGMap map, Cursor cursor, final LayerManager lManager, LinkedList path, Image image);
 
     public void move(int x, int y);
 
     public void endTurn(LayerManager lManager, Image image);
 
     public void newTurn(LayerManager lManager);
-    
+
     public void beAttacked(Unit attacker);
 
     public void isDead(LayerManager lManager, Image image);
@@ -37,8 +39,8 @@ public interface Unit {
     public void setEndTurn(boolean endTurn);
 
     public Attackable getAttackType();
-    
+
     public int getAttack();
-    
+
     public int getHealth();
 }

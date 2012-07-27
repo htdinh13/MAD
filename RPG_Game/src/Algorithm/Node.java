@@ -96,7 +96,7 @@ public class Node implements Comparable {
     }
 
     public String toString() {
-        return "[Node " + nodeID + " " + getX() + "," + getY() + " (" + (blocked ? " " : "X") + ")]";
+        return "[Node " + nodeID + " " + getX() + "," + getY() + " (" + (blocked ? "X" : " ") + ")]" + " Visisted " + visited + "Parrent " + ((parent != null) ? "" + parent : "null");
     }
 
     public int getX() {

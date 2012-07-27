@@ -21,6 +21,12 @@ public class PlayerUnit extends UnitAbstract {
         this.preY = super.getY();
     }
 
+    public PlayerUnit(int x, int y, Image img, int moveSpace, Attackable attackType, int health, int attack, int defence) {
+        super(x, y, img, moveSpace, attackType, health, attack, defence);
+        this.preX = super.getX();
+        this.preY = super.getY();
+    }
+
     public void move(int x, int y) {
         this.preX = super.getX();
         this.preY = super.getY();

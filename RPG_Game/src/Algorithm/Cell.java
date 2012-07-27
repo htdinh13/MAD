@@ -1,9 +1,5 @@
 package Algorithm;
 
-/**
- *
- * @author HOANG TRUONG DINH
- */
 public class Cell {
 
     private int x, y;

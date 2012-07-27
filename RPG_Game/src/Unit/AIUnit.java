@@ -19,6 +19,6 @@ public class AIUnit extends UnitAbstract {
     }
 
     public void live(LayerManager lManager, Image img) {
-        
+        super.endTurn(lManager, img);
     }
 }

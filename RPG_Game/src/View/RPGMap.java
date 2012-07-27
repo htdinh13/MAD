@@ -31,13 +31,13 @@ import javax.microedition.lcdui.game.TiledLayer;
 public class RPGMap extends GameCanvas implements Runnable {
 
     private int x, y, index;
-    private Image[] images;
-    private Cursor cursorSpr;
+    public Image[] images;
+    public Cursor cursorSpr;
     private Sprite selectedSpr;
     public Sprite movedSpr;
     private Unit[] ai_units, pl_units;
     private TiledLayer backgroundLayer, movingLayer, attackingLayer;
-    private LayerManager lManager;
+    public LayerManager lManager;
     private final int cells[][] = {
         {4, 4, 4, 4, 4, 17, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 3, 3, 3, 3, 3, 3, 3, 3},
         {4, 5, 5, 5, 4, 11, 1, 1, 1, 1, 1, 1, 2, 2, 1, 1, 1, 1, 1, 3, 3, 3, 3, 3, 3},
@@ -57,14 +57,13 @@ public class RPGMap extends GameCanvas implements Runnable {
     };
     private Cell attackCells[];
     private Node movingCells[][];
-    private boolean onSelected, isMoved, isMoving, isAI, isAttacking;
+    private boolean onSelected, isMoved, isMoving, isAttacking;
     private Unit selectedUnit;
-    //For PathFinding
     private int gridCols, gridRows;
     private Node start, goal;
     private AStar astar;
     private LinkedList path, openList, closedList;
-    //Game Handler
+    public Thread keyThread;
     GameHandler game;
 
     public void loadImages() throws IOException {
@@ -81,7 +80,6 @@ public class RPGMap extends GameCanvas implements Runnable {
         this.index = 0;
         this.onSelected = false;
         this.isMoved = false;
-        this.isAI = false;
         this.isMoving = false;
         this.isAttacking = false;
         this.ai_units = new Unit[23];
@@ -111,18 +109,33 @@ public class RPGMap extends GameCanvas implements Runnable {
 
         createPLUnits();
         createAIUnits();
-        game = new GameHandler(ai_units, pl_units);
+        game = new GameHandler(ai_units, pl_units, this);
 
         this.lManager.insert(cursorSpr, 1);
         this.lManager.insert(backgroundLayer, lManager.getSize());
         this.lManager.setViewWindow(x, y, this.getWidth(), this.getHeight() - 3);
         this.lManager.paint(getGraphics(), 0, 0);
         flushGraphics();
+
+        keyThread = new Thread(new Runnable() {
+
+            public void run() {
+                while (true) {
+                    keyPressed();
+                    try {
+                        Thread.sleep(150);
+                    } catch (InterruptedException ex) {
+                        ex.printStackTrace();
+                    }
+                }
+            }
+        });
+        keyThread.start();
     }
 
     public void createAIUnits() {
         ai_units[0] = new AIUnit(3, 4, images[14], 5, new CavalryAttack(images[5], lManager));
-        ai_units[0] = new AIUnit(10, 2, images[14], 5, new CavalryAttack(images[5], lManager));
+        // ai_units[0] = new AIUnit(10, 2, images[14], 5, new CavalryAttack(images[5], lManager));
         ai_units[1] = new AIUnit(10, 3, images[14], 5, new CavalryAttack(images[5], lManager));
         ai_units[2] = new AIUnit(11, 2, images[14], 5, new CavalryAttack(images[5], lManager));
         ai_units[3] = new AIUnit(11, 3, images[14], 5, new CavalryAttack(images[5], lManager));
@@ -154,10 +167,10 @@ public class RPGMap extends GameCanvas implements Runnable {
 
     public void createPLUnits() {
         pl_units[0] = new PlayerUnit(2, 2, images[16], 5, new CavalryAttack(images[5], lManager), 120, 40, 15);
-        pl_units[1] = new PlayerUnit(3, 3, images[18], 4, new KnightAttack(images[4], lManager), 150, 30, 20);
-        pl_units[2] = new PlayerUnit(3, 1, images[20], 3, new RangedAttack(images[6], lManager), 80, 35, 10);
-        pl_units[3] = new PlayerUnit(2, 7, images[17], 5, new CavalryAttack(images[5], lManager), 140, 50, 15);
-        pl_units[4] = new PlayerUnit(3, 7, images[19], 5, new CavalryAttack(images[5], lManager), 140, 50, 15);
+//        pl_units[1] = new PlayerUnit(3, 3, images[18], 4, new KnightAttack(images[4], lManager), 150, 30, 20);
+//        pl_units[2] = new PlayerUnit(3, 1, images[20], 3, new RangedAttack(images[6], lManager), 80, 35, 10);
+//        pl_units[3] = new PlayerUnit(2, 7, images[17], 5, new CavalryAttack(images[5], lManager), 140, 50, 15);
+//        pl_units[4] = new PlayerUnit(3, 7, images[19], 5, new CavalryAttack(images[5], lManager), 140, 50, 15);
         for (int i = 0; i < pl_units.length; i++) {
             if (pl_units[i] != null) {
                 lManager.append(pl_units[i].getSprite());
@@ -176,9 +189,10 @@ public class RPGMap extends GameCanvas implements Runnable {
                 pl_units[i].getSprite().nextFrame();
             }
         }
+        cursorSpr.nextFrame();
     }
 
-    public Node[][] createMovingLayer(Unit selectedUnit) {
+    public Node[][] createMovingNodes(Unit selectedUnit) {
         int col = selectedUnit.getX() / 24;
         int row = selectedUnit.getY() / 24;
         int space = selectedUnit.getMoveSpace();
@@ -237,9 +251,37 @@ public class RPGMap extends GameCanvas implements Runnable {
             }
         }
         movingLayer.setPosition((col - space) * 24, (row - space) * 24);
-//        removeUnmoveableCell(space);
         lManager.insert(movingLayer, lManager.getSize() - 1);
         return movingCells;
+    }
+
+    public void createMovingLayer(Unit selectedUnit) {
+        int col = selectedUnit.getX() / 24;
+        int row = selectedUnit.getY() / 24;
+        int space = selectedUnit.getMoveSpace();
+        gridCols = space * 2 + 1;
+        gridRows = space * 2 + 1;
+        movingLayer = new TiledLayer((gridCols), gridRows, images[10], 24, 24);
+        for (int i = 0; i < gridCols; i++) {
+            for (int j = 0; j < gridRows; j++) {
+                int a = i + col - space, b = j + row - space;
+                if (!(j == space && i == space) && ((i <= space) && (j >= space - i) && (j <= space + i) || ((i > space) && (j >= i - space) && (j < space * 2 + 1 - i + space)))) {
+                    if (a >= 0 && b >= 0 && a < 25 && b < 15) {
+                        if (backgroundLayer.getCell(a, b) < 10) {
+                            if (getPLUnit(a * 24, b * 24) == null) {
+                                if (getAIUnit(a * 24, b * 24) == null) {
+                                    movingLayer.setCell(i, j, 2);
+                                }
+                            }
+
+                        }
+                    }
+                }
+            }
+        }
+        movingLayer.setPosition((col - space) * 24, (row - space) * 24);
+        lManager.insert(movingLayer, lManager.getSize() - 1);
+
     }
 
     public void resetMovingCells() {
@@ -309,28 +351,22 @@ public class RPGMap extends GameCanvas implements Runnable {
     }
 
     protected void keyPressed(int keyCode) {
-        //int gameAction = getGameAction(keyCode);
         switch (keyCode) {
-            // Use '0' for show the movement range
             case KEY_NUM0:
                 if (!onSelected) {
 
                     selectedUnit = getAIUnit(cursorSpr.getX_(), cursorSpr.getY_());
+                    System.out.println("0 pressed");
                     if (selectedUnit != null) {
-                        isAI = true;
+                        System.out.println("AI pressed");
                     } else {
                         selectedUnit = getPLUnit(cursorSpr.getX_(), cursorSpr.getY_());
                     }
                     if (selectedUnit != null && !selectedUnit.getEndTurn()) {
-                        if (isAI) {
                             createMovingLayer(selectedUnit);
-                        } else {
-                            createMovingLayer(selectedUnit);
-                        }
                     }
                 }
                 break;
-            // Use '#' for cancel or undo command    
             case KEY_POUND:
                 if (onSelected) {
                     if (isMoving) {
@@ -345,7 +381,6 @@ public class RPGMap extends GameCanvas implements Runnable {
                                 ((PlayerUnit) selectedUnit).unmove();
                                 lManager.remove(movedSpr);
                                 setActiveView(selectedUnit.getX(), selectedUnit.getY());
-                                //selectedSpr.setVisible(true);
                                 movingLayer.setVisible(true);
                                 cursorSpr.move(selectedUnit.getX(), selectedUnit.getY());
                             }
@@ -377,7 +412,6 @@ public class RPGMap extends GameCanvas implements Runnable {
     }
 
     protected void keyReleased(int keyCode) {
-        //int gameAction = getGameAction(keyCode);
         switch (keyCode) {
             case KEY_NUM0:
                 if (!onSelected) {
@@ -505,19 +539,15 @@ public class RPGMap extends GameCanvas implements Runnable {
                 if (!isMoving) {
                     if (!isAttacking) {
                         switch (selectedSpr.getFrame()) {
-                            // Change to moving state
                             case 0:
-                                createMovingLayer(selectedUnit);
+                                createMovingNodes(selectedUnit);
                                 selectedSpr.setVisible(false);
                                 isMoving = true;
                                 break;
-                            // End Turn without move    
                             case 1:
                                 unitEndTurned();
                                 break;
-                            // Attack without move    
                             case 2:
-                                //System.out.println("Attack");
                                 isAttacking = true;
                                 createAttackingLayer(selectedUnit);
                                 selectedSpr.setVisible(false);
@@ -530,7 +560,6 @@ public class RPGMap extends GameCanvas implements Runnable {
                         if (attacked != null) {
                             selectedUnit.getAttackType().attack(selectedUnit, attacked);
                             selectedUnit.getAttackType().start();
-                            // Attack 
                             if (attacked.getHealth() <= 0) {
                                 attacked.isDead(lManager, images[8]);
                             }
@@ -539,7 +568,6 @@ public class RPGMap extends GameCanvas implements Runnable {
                     }
                 } else {
                     if (!isMoved) {
-                        // Change to moved state (can undo)
                         if (getUnit(cursorSpr.getX_(), cursorSpr.getY_()) == null) {
                             try {
                                 resetMovingCells();
@@ -551,6 +579,7 @@ public class RPGMap extends GameCanvas implements Runnable {
                             }
                         }
                         if (selectedUnit.move(this, cursorSpr, lManager, path, images[11])) {
+                            path = null;
                             selectedSpr.setVisible(false);
                             movingLayer.setVisible(false);
                             isMoved = true;
@@ -558,14 +587,12 @@ public class RPGMap extends GameCanvas implements Runnable {
                     } else {
                         if (!isAttacking) {
                             switch (movedSpr.getFrame()) {
-                                //Attack after moved
                                 case 0:
                                     isAttacking = true;
                                     createAttackingLayer(selectedUnit);
                                     movedSpr.setVisible(false);
                                     break;
 
-                                //End Turn after moved    
                                 case 1:
                                     unitEndTurned();
                                 default:
@@ -576,7 +603,6 @@ public class RPGMap extends GameCanvas implements Runnable {
                             if (attacked != null) {
                                 selectedUnit.getAttackType().attack(selectedUnit, attacked);
                                 selectedUnit.getAttackType().start();
-                                //Attacking
                                 if (attacked.getHealth() <= 0) {
                                     attacked.isDead(lManager, images[8]);
                                 }
@@ -593,8 +619,6 @@ public class RPGMap extends GameCanvas implements Runnable {
     }
 
     public void unitEndTurned() {
-        //selectedSpr.setVisible(false);
-        //selectedUnit = getPLUnit(cursorSpr.getX_(), cursorSpr.getY_());
         cursorSpr.move(selectedUnit.getX(), selectedUnit.getY());
         selectedUnit.endTurn(lManager, images[3]);
         if (movedSpr != null) {
@@ -686,6 +710,8 @@ public class RPGMap extends GameCanvas implements Runnable {
         Graphics g = this.getGraphics();
         lManager.setViewWindow(x, y, this.getWidth(), this.getHeight() - 3);
         lManager.paint(g, 0, 0);
+        g.setColor(255, 0, 0);
+        getGraphics().drawString("GAME ", 0, 0, Graphics.TOP | Graphics.LEFT);
         flushGraphics();
     }
 
@@ -700,10 +726,8 @@ public class RPGMap extends GameCanvas implements Runnable {
                 System.out.println("Finish");
                 break;
             }
-            
-            cursorSpr.nextFrame();
             animationUnits();
-            keyPressed();
+//            keyPressed();
             drawLayer();
             try {
                 Thread.sleep(175);

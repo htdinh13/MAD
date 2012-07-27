@@ -27,6 +27,7 @@ public class TiledMap extends MIDlet implements CommandListener {
         RPGMap cv = new RPGMap(false);
         mDisplay.setCurrent(cv);
         cv.start();
+        cv.game.start();
     }
 
     public void commandAction(Command c, Displayable d) {

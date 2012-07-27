@@ -1,13 +1,6 @@
-/*
- * To change this template, choose Tools | Templates
- * and open the template in the editor.
- */
+
 package Algorithm;
 
-/**
- *
- * @author kem
- */
 public class LinkedList {
 
     public Node head, last;
@@ -15,18 +8,6 @@ public class LinkedList {
     public LinkedList() {
         head = null;
         last = null;
-    }
-
-    public void addFirst(Cell cell, int nodeID) {
-        Node newNode = new Node(cell, nodeID);
-        final Node f = head;
-        newNode.next = head;
-        head = newNode;
-        if (f == null) {
-            last = head;
-        } else {
-            f.prev = head;
-        }
     }
 
     public void addFirst(Node node) {
@@ -57,19 +38,6 @@ public class LinkedList {
         while (head != null) {
             (this.removeFirst()).reset();
         }
-    }
-
-    public boolean contains(Cell cell) {
-        int index = 0;
-        Node current = head;
-        while (current != null) {
-            if (current.data.getX() == cell.getX() && current.data.getY() == cell.getY()) {
-                return true;
-            }
-            current = current.next;
-            index++;
-        }
-        return false;
     }
 
     public boolean contains(Node node) {
@@ -128,12 +96,12 @@ public class LinkedList {
         }
         return first;
     }
-    
+
     public void print() {
         Node current = head;
         int count = 1;
         while (current != null) {
-            System.out.println("\tNode " + count + " (" + current.data.getX() + "," + current.data.getY() + ") H=" + current.estimatedCostToGoal+" G="+current.costFromStart);
+            System.out.println("\tNode " + count + " (" + current.data.getX() + "," + current.data.getY() + ") H=" + current.estimatedCostToGoal + " G=" + current.costFromStart);
             current = current.next;
             count++;
         }

@@ -12,10 +12,6 @@ import javax.microedition.lcdui.Image;
 import javax.microedition.lcdui.game.LayerManager;
 import javax.microedition.lcdui.game.Sprite;
 
-/**
- *
- * @author HOANG TRUONG DINH
- */
 public abstract class UnitAbstract implements Unit {
 
     private Sprite sprite, endSprite, deadSprite;
@@ -113,7 +109,10 @@ public abstract class UnitAbstract implements Unit {
 
     public void newTurn(LayerManager lManager) {
         endTurn = false;
-        lManager.remove(endSprite);
+        if (endSprite != null) {
+            endSprite.setVisible(false);
+            lManager.remove(endSprite);
+        }
     }
 
     public void move(int x, int y) {
@@ -141,7 +140,6 @@ public abstract class UnitAbstract implements Unit {
                                 ex.printStackTrace();
                             }
                         }
-
                         map.movedSpr = new Sprite(image, 22, 14);
                         map.movedSpr.setFrame(0);
                         if (cursor.getY_() == 0) {
@@ -156,7 +154,6 @@ public abstract class UnitAbstract implements Unit {
             t.start();
             return true;
         }
-
         return false;
     }
 
@@ -195,6 +192,7 @@ public abstract class UnitAbstract implements Unit {
         t.start();
         x = -1;
         y = -1;
+        deadSprite.setVisible(false);
     }
 
     public void beAttacked(Unit attacker) {

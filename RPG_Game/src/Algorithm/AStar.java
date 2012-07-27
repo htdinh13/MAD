@@ -1,13 +1,5 @@
-/*
- * To change this template, choose Tools | Templates
- * and open the template in the editor.
- */
 package Algorithm;
 
-/**
- *
- * @author Luu Manh 13
- */
 public class AStar {
 
     private LinkedList open, closed;

@@ -68,6 +68,7 @@ public class AIUnit extends UnitAbstract {
         } else {
             this.endTurn(map.lManager, map.images[3]);
         }
+        this.notifyAll();
         return false;
     }
 

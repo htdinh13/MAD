@@ -77,19 +77,27 @@ public class GameHandler implements Runnable {
         map.cursorSpr.setVisible(false);
         newTurnAllUnits();
         for (int i = 0; i < aiUnits.length; i++) {
-            //pleaseWait = true;
-            if (aiUnits[i] != null && aiUnits[i].getHealth() > 0) {
-                map.setActiveView(aiUnits[i].getX(), aiUnits[i].getY());
-//                ((AIUnit) aiUnits[i]).live(map.lManager, map.images[3]);
-                try {
-                    Thread.sleep(100);
-                } catch (InterruptedException ex) {
-                    ex.printStackTrace();
-                }
+            boolean iswait = true;
+            while (iswait) {
+                //synchronized (this) {
+                    if (aiUnits[i] != null && aiUnits[i].getHealth() > 0) {
+                        map.setActiveView(aiUnits[i].getX(), aiUnits[i].getY());
+                        iswait = ((AIUnit) aiUnits[i]).live(map);
+                        try {
+                            Thread.sleep(100);
+                        } catch (InterruptedException ex) {
+                            ex.printStackTrace();
+                        }
+                    }
+                    try {
+                        this.wait();
+                    } catch (InterruptedException ex) {
+                        ex.printStackTrace();
+                    }
+               // }
             }
             playerTurn = true;
         }
-        //public boolean pleaseWait = true;
     }
 
     public void run() {

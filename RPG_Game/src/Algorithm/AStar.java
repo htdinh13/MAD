@@ -89,7 +89,6 @@ public class AStar {
                     }
                 }
                 closed.add(node);
-//             
             }
         }
         return null;

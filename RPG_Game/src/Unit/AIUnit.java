@@ -31,26 +31,30 @@ public class AIUnit extends UnitAbstract {
                 LinkedList goalNodes = createGoalNodes(nearUnit[i], map);
                 if (!goalNodes.isEmpty()) {
                     Node nodes[][] = map.createAIMovingNodes(this.getX() / 24, this.getY() / 24, this.getMoveSpace());
+                    
                     LinkedList open = new LinkedList(), close = new LinkedList();
                     AStar astar = new AStar(open, close);
                     Node start = getStartNode(nodes);
+                    System.out.println("Start " + start);
                     Node goal = goalNodes.head;
                     LinkedList path = null;
                     while (path == null) {
+                        System.out.println("Goal " + goal);
                         path = astar.findPath(start, goal);
 
                         if (path != null && path.isEmpty()) {
-                            this.move(map, path);
-                            this.getAttackType().attack(this, nearUnit[i]);
-                            this.getAttackType().start();
-                            if (nearUnit[i].getHealth() <= 0) {
-                                nearUnit[i].isDead(map.lManager, map.images[8]);
+                            //System.out.println(path);
+                            if (this.move(map, path)) {
+                                this.getAttackType().attack(this, nearUnit[i]);
+                                this.getAttackType().start();
+                                if (nearUnit[i].getHealth() <= 0) {
+                                    nearUnit[i].isDead(map.lManager, map.images[8]);
+                                }
                             }
-                            this.endTurn(map.lManager, map.images[3]);
+                            path.print();
                         }
 
                         //break;
-                        path.clear();
                         open.clear();
                         close.clear();
                         for (int x = 0; x < this.getMoveSpace() * 2 + 1; x++) {
@@ -59,16 +63,11 @@ public class AIUnit extends UnitAbstract {
                             }
                         }
                         goal = goal.next;
-                        path = astar.findPath(start, goal);
-                    }
-                } else {
-                    this.endTurn(map.lManager, map.images[3]);
+                    } 
                 }
             }
-        } else {
-            this.endTurn(map.lManager, map.images[3]);
         }
-        this.notifyAll();
+        this.endTurn(map.lManager, map.images[3]);
         return false;
     }
 
@@ -156,7 +155,6 @@ public class AIUnit extends UnitAbstract {
                             addNode(nodes, map, x + g, y + h);
                         }
                     } else if (Math.abs((g + h) % 2) == 1) {
-                        System.out.println((x + g) + "," + (y + h));
                         addNode(nodes, map, x + g, y + h);
                     }
                 }

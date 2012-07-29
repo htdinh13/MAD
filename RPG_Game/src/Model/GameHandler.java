@@ -74,12 +74,20 @@ public class GameHandler implements Runnable {
     }
 
     public void AITurn() {
+        boolean gate=true;
         map.cursorSpr.setVisible(false);
         newTurnAllUnits();
         for (int i = 0; i < aiUnits.length; i++) {
             if (aiUnits[i] != null && aiUnits[i].getHealth() > 0) {
                 map.setActiveView(aiUnits[i].getX(), aiUnits[i].getY());
-                ((AIUnit) aiUnits[i]).live(map);
+                gate=((AIUnit) aiUnits[i]).live(map);
+                while(gate){
+                    try {
+                        wait();
+                    } catch (InterruptedException ex) {
+                        ex.printStackTrace();
+                    }
+                }
                 //aiUnits[i].endTurn(map.lManager, map.images[3]);
                 try {
                     Thread.sleep(100);

@@ -15,7 +15,7 @@ import javax.microedition.lcdui.game.Sprite;
 public abstract class UnitAbstract implements Unit {
 
     private Sprite sprite, endSprite, deadSprite;
-    private int x, y;
+    public  int x, y;
     private boolean endTurn;
     private Attackable attackType;
     public int health, attack, defence, moveSpace;

@@ -24,50 +24,52 @@ public class AIUnit extends UnitAbstract {
     }
 
     public boolean live(RPGMap map) {
+
         Unit[] nearUnit = getNearUnit(map);
         if (!isNearUnitEmpty(nearUnit)) {
             sortUnitsByHealth(nearUnit);
-            for (int i = 0; i < nearUnit.length; i++) {
+            for (int i = 0; i < nearUnit.length && this.getEndTurn() == false; i++) {
                 LinkedList goalNodes = createGoalNodes(nearUnit[i], map);
                 if (!goalNodes.isEmpty()) {
+                    System.out.println("GOAL NODES");
+                    goalNodes.print();
                     Node nodes[][] = map.createAIMovingNodes(this.getX() / 24, this.getY() / 24, this.getMoveSpace());
-                    
+
                     LinkedList open = new LinkedList(), close = new LinkedList();
                     AStar astar = new AStar(open, close);
                     Node start = getStartNode(nodes);
-                    System.out.println("Start " + start);
                     Node goal = goalNodes.head;
                     LinkedList path = null;
-                    while (path == null) {
-                        System.out.println("Goal " + goal);
+                    do {
+                        System.out.println("Start " + start + "TO Goal " + goal);
                         path = astar.findPath(start, goal);
 
-                        if (path != null && path.isEmpty()) {
-                            //System.out.println(path);
-                            if (this.move(map, path)) {
-                                this.getAttackType().attack(this, nearUnit[i]);
-                                this.getAttackType().start();
-                                if (nearUnit[i].getHealth() <= 0) {
-                                    nearUnit[i].isDead(map.lManager, map.images[8]);
-                                }
-                            }
+                        if (path != null && !path.isEmpty()) {
                             path.print();
-                        }
-
-                        //break;
-                        open.clear();
-                        close.clear();
-                        for (int x = 0; x < this.getMoveSpace() * 2 + 1; x++) {
-                            for (int y = 0; y < this.getMoveSpace() * 2 + 1; y++) {
-                                nodes[x][y].reset();
+                            System.out.println(path.head);
+                            //System.out.println(path);
+                            this.move(map, path);
+                            this.getAttackType().attack(this, nearUnit[i]);
+                            this.getAttackType().start();
+                            if (nearUnit[i].getHealth() <= 0) {
+                                nearUnit[i].isDead(map.lManager, map.images[8]);
                             }
                         }
+//                    path.clear();
+//                        open.clear();
+//                        close.clear();
+//                        for (int x = 0; x < this.getMoveSpace() * 2 + 1; x++) {
+//                            for (int y = 0; y < this.getMoveSpace() * 2 + 1; y++) {
+//                                nodes[x][y].reset();
+//                            }
+//                        }
                         goal = goal.next;
-                    } 
+                    } while (path == null);
+                    this.setEndTurn(true);
                 }
             }
         }
-        this.endTurn(map.lManager, map.images[3]);
+        //this.endTurn(map.lManager, map.images[3]);
         return false;
     }
 
@@ -79,19 +81,19 @@ public class AIUnit extends UnitAbstract {
                     synchronized (map.lManager) {
                         Node n = path.head;
                         while (n != null) {
-                            int x = n.getX() * 24;
-                            int y = n.getY() * 24;
+                            x = n.getX() * 24;
+                            y = n.getY() * 24;
                             map.setActiveView(x, y);
                             getSprite().setPosition(x, y);
                             n = n.next;
 
                             try {
-                                Thread.sleep(150);
+                                Thread.sleep(300);
                             } catch (InterruptedException ex) {
                                 ex.printStackTrace();
                             }
                         }
-                        //endTurn(map.lManager, map.images[3]);
+                        endTurn(map.lManager, map.images[3]);
                     }
                 }
             });

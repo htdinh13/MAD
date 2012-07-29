@@ -167,10 +167,10 @@ public class RPGMap extends GameCanvas implements Runnable {
 
     public void createPLUnits() {
         pl_units[0] = new PlayerUnit(2, 2, images[16], 5, new CavalryAttack(images[5], lManager), 120, 40, 15);
-//        pl_units[1] = new PlayerUnit(3, 3, images[18], 4, new KnightAttack(images[4], lManager), 150, 30, 20);
-//        pl_units[2] = new PlayerUnit(3, 1, images[20], 3, new RangedAttack(images[6], lManager), 80, 35, 10);
-//        pl_units[3] = new PlayerUnit(2, 7, images[17], 5, new CavalryAttack(images[5], lManager), 140, 50, 15);
-//        pl_units[4] = new PlayerUnit(3, 7, images[19], 5, new CavalryAttack(images[5], lManager), 140, 50, 15);
+        pl_units[1] = new PlayerUnit(3, 3, images[18], 4, new KnightAttack(images[4], lManager), 150, 30, 20);
+        pl_units[2] = new PlayerUnit(3, 1, images[20], 3, new RangedAttack(images[6], lManager), 80, 35, 10);
+        pl_units[3] = new PlayerUnit(2, 7, images[17], 5, new CavalryAttack(images[5], lManager), 140, 50, 15);
+        pl_units[4] = new PlayerUnit(3, 7, images[19], 5, new CavalryAttack(images[5], lManager), 140, 50, 15);
         for (int i = 0; i < pl_units.length; i++) {
             if (pl_units[i] != null) {
                 lManager.append(pl_units[i].getSprite());

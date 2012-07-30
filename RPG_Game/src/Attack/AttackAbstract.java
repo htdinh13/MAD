@@ -1,5 +1,6 @@
 package Attack;
 
+import Model.GameHandler;
 import Unit.Unit;
 import javax.microedition.lcdui.Image;
 import javax.microedition.lcdui.game.LayerManager;
@@ -13,14 +14,16 @@ public abstract class AttackAbstract implements Attackable, Runnable {
 
     private Sprite attackSpr;
     private LayerManager lManager;
+    public GameHandler game;
 
     public AttackAbstract(Image img, int width, int height) {
         attackSpr = new Sprite(img, width, height);
     }
 
-    public AttackAbstract(Image img, LayerManager lManager) {
+    public AttackAbstract(Image img, LayerManager lManager, GameHandler game) {
         attackSpr = new Sprite(img, 30, 30);
         this.lManager = lManager;
+        this.game = game;
     }
 
     public void setAttackSpr(Sprite attackSpr) {
@@ -33,24 +36,26 @@ public abstract class AttackAbstract implements Attackable, Runnable {
 
     public void attack(Unit attacker, Unit attacked) {
         attacked.beAttacked(attacker);
-        attackSpr.setVisible(true);
         attackSpr.setPosition(attacked.getX() - 4, attacked.getY() - 4);
-        lManager.insert(attackSpr, 0);
     }
 
     public void run() {
         synchronized (lManager) {
-            attackSpr.setFrame(1);
-            //while(true){
-            for (int i = 0; i < attackSpr.getFrameSequenceLength() - 2; i++) {
-                attackSpr.nextFrame();
-                try {
-                    Thread.sleep(250);
-                } catch (InterruptedException ex) {
-                    ex.printStackTrace();
+            synchronized (game) {
+                attackSpr.setVisible(true);
+                lManager.insert(attackSpr, 0);
+                attackSpr.setFrame(1);
+                //while(true){
+                for (int i = 0; i < attackSpr.getFrameSequenceLength() - 2; i++) {
+                    attackSpr.nextFrame();
+                    try {
+                        Thread.sleep(250);
+                    } catch (InterruptedException ex) {
+                        ex.printStackTrace();
+                    }
                 }
+                lManager.remove(attackSpr);
             }
-            lManager.remove(attackSpr);
         }
     }
 

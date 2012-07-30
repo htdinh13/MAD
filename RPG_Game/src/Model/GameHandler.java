@@ -31,7 +31,7 @@ public class GameHandler implements Runnable {
     public void endTurnAllUnit(Unit[] units) {
         for (int i = 0; i < units.length; i++) {
             if (aiUnits[i] != null && aiUnits[i].getHealth() > 0) {
-                units[i].setEndTurn(true);
+                units[i].endTurn(map.lManager);
             }
         }
     }
@@ -60,7 +60,7 @@ public class GameHandler implements Runnable {
             }
         }
         for (int i = 0; i < plUnits.length; i++) {
-            if (plUnits[i] != null && plUnits[i].getHealth() > 0) {
+            if (plUnits[i] != null && plUnits[i].getHealth() >0) {
                 plUnits[i].newTurn(map.lManager);
             }
         }
@@ -74,25 +74,18 @@ public class GameHandler implements Runnable {
     }
 
     public void AITurn() {
-        boolean gate=true;
-        map.cursorSpr.setVisible(false);
+        map.cursorSpr.setVisible(false);        
         newTurnAllUnits();
         for (int i = 0; i < aiUnits.length; i++) {
             if (aiUnits[i] != null && aiUnits[i].getHealth() > 0) {
-                map.setActiveView(aiUnits[i].getX(), aiUnits[i].getY());
-                gate=((AIUnit) aiUnits[i]).live(map);
-                while(gate){
+                synchronized (this) {
+                    map.setActiveView(aiUnits[i].getX(), aiUnits[i].getY());
+                    ((AIUnit) aiUnits[i]).live(map, this);
                     try {
-                        wait();
+                        Thread.sleep(100);
                     } catch (InterruptedException ex) {
                         ex.printStackTrace();
                     }
-                }
-                //aiUnits[i].endTurn(map.lManager, map.images[3]);
-                try {
-                    Thread.sleep(100);
-                } catch (InterruptedException ex) {
-                    ex.printStackTrace();
                 }
             }
         }
@@ -101,16 +94,13 @@ public class GameHandler implements Runnable {
 
     public void run() {
         while (true) {
-
             if (playerTurn) {
                 this.PLTurn();
                 while (!checkAllUnitEndTurn(plUnits)) {
                 }
                 playerTurn = false;
             } else {
-                System.out.println("AITURN");
                 this.AITurn();
-
             }
         }
     }

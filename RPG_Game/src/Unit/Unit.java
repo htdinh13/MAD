@@ -26,7 +26,7 @@ public interface Unit {
 
     public void move(int x, int y);
 
-    public void endTurn(LayerManager lManager, Image image);
+    public void endTurn(LayerManager lManager);
 
     public void newTurn(LayerManager lManager);
 

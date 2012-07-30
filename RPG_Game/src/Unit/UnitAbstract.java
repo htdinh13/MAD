@@ -8,6 +8,7 @@ import Attack.KnightAttack;
 import Attack.RangedAttack;
 import View.Cursor;
 import View.RPGMap;
+import java.io.IOException;
 import javax.microedition.lcdui.Image;
 import javax.microedition.lcdui.game.LayerManager;
 import javax.microedition.lcdui.game.Sprite;
@@ -15,12 +16,13 @@ import javax.microedition.lcdui.game.Sprite;
 public abstract class UnitAbstract implements Unit {
 
     private Sprite sprite, endSprite, deadSprite;
-    public  int x, y;
+    public int x, y;
     private boolean endTurn;
     private Attackable attackType;
     public int health, attack, defence, moveSpace;
 
-    public UnitAbstract(int colnum, int rownum, Image img, int moveSpace, Attackable attackType) {
+    public UnitAbstract(int colnum, int rownum, Image img, Image imgEnd,
+            int moveSpace, Attackable attackType) {
         this.x = colnum * 24;
         this.y = rownum * 24;
         this.moveSpace = moveSpace;
@@ -42,9 +44,11 @@ public abstract class UnitAbstract implements Unit {
             this.attack = 30;
             this.defence = 10;
         }
+        endSprite = new Sprite(imgEnd);
+        endSprite.setVisible(false);
     }
 
-    public UnitAbstract(int colnum, int rownum, Image img, int moveSpace, Attackable attackType, int health, int attack, int defence) {
+    public UnitAbstract(int colnum, int rownum, Image img, Image imgEnd, int moveSpace, Attackable attackType, int health, int attack, int defence) {
         this.x = colnum * 24;
         this.y = rownum * 24;
         this.moveSpace = moveSpace;
@@ -57,6 +61,8 @@ public abstract class UnitAbstract implements Unit {
         this.health = health;
         this.attack = attack;
         this.defence = defence;
+        endSprite = new Sprite(imgEnd);
+        endSprite.setVisible(false);
     }
 
     public int getX() {
@@ -99,12 +105,11 @@ public abstract class UnitAbstract implements Unit {
         this.endTurn = endTurn;
     }
 
-    public void endTurn(LayerManager lManager, Image image) {
-        endSprite = new Sprite(image);
-        endSprite.setVisible(true);
-        endSprite.setPosition(x, y);
+    public void endTurn(LayerManager lManager) {
+        this.endSprite.setVisible(true);
+        this.endSprite.setPosition(x, y);
         lManager.insert(endSprite, 4);
-        endTurn = true;
+        this.endTurn = true;
     }
 
     public void newTurn(LayerManager lManager) {
@@ -170,7 +175,6 @@ public abstract class UnitAbstract implements Unit {
         } else {
             deadSprite.setPosition(x + 4, y - 20);
         }
-        //lManager.insert(deadSprite, 4);
         Thread t = new Thread(new Runnable() {
 
             public void run() {
@@ -191,8 +195,7 @@ public abstract class UnitAbstract implements Unit {
             }
         });
         t.start();
-        x = -1;
-        y = -1;
+        endSprite.setVisible(false);
         deadSprite.setVisible(false);
     }
 

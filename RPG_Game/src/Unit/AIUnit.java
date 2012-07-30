@@ -6,6 +6,7 @@ import Algorithm.LinkedList;
 import Algorithm.Node;
 import Attack.Attackable;
 import Attack.RangedAttack;
+import Model.GameHandler;
 import View.RPGMap;
 import javax.microedition.lcdui.Image;
 
@@ -15,46 +16,46 @@ import javax.microedition.lcdui.Image;
  */
 public class AIUnit extends UnitAbstract {
 
-    public AIUnit(int colnum, int rownum, Image img, int moveSpace, Attackable attackType) {
-        super(colnum, rownum, img, moveSpace, attackType);
+    public AIUnit(int colnum, int rownum, Image img, Image imgEnd, int moveSpace, Attackable attackType) {
+        super(colnum, rownum, img, imgEnd, moveSpace, attackType);
     }
 
-    public AIUnit(int x, int y, Image img, int moveSpace, Attackable attackType, int health, int attack, int defence) {
-        super(x, y, img, moveSpace, attackType, health, attack, defence);
+    public AIUnit(int x, int y, Image img, Image imgEnd, int moveSpace, Attackable attackType, int health, int attack, int defence) {
+        super(x, y, img, imgEnd, moveSpace, attackType, health, attack, defence);
     }
 
-    public boolean live(RPGMap map) {
+    public boolean live(RPGMap map, GameHandler game) {
+            Unit[] nearUnit = getNearUnit(map);
+            if (!isNearUnitEmpty(nearUnit)) {
+                sortUnitsByHealth(nearUnit);
+                for (int i = 0; i < nearUnit.length && this.getEndTurn() == false; i++) {
+                    LinkedList goalNodes = createGoalNodes(nearUnit[i], map);
+                    if (!goalNodes.isEmpty()) {
+                        System.out.println("GOAL NODES");
+                        goalNodes.print();
+                        Node nodes[][] = map.createAIMovingNodes(this.getX() / 24, this.getY() / 24, this.getMoveSpace());
 
-        Unit[] nearUnit = getNearUnit(map);
-        if (!isNearUnitEmpty(nearUnit)) {
-            sortUnitsByHealth(nearUnit);
-            for (int i = 0; i < nearUnit.length && this.getEndTurn() == false; i++) {
-                LinkedList goalNodes = createGoalNodes(nearUnit[i], map);
-                if (!goalNodes.isEmpty()) {
-                    System.out.println("GOAL NODES");
-                    goalNodes.print();
-                    Node nodes[][] = map.createAIMovingNodes(this.getX() / 24, this.getY() / 24, this.getMoveSpace());
+                        LinkedList open = new LinkedList(), close = new LinkedList();
+                        AStar astar = new AStar(open, close);
+                        Node start = getStartNode(nodes);
+                        Node goal = goalNodes.head;
+                        LinkedList path = null;
+                        do {
+                            System.out.println("Start " + start + "TO Goal " + goal);
+                            path = astar.findPath(start, goal);
 
-                    LinkedList open = new LinkedList(), close = new LinkedList();
-                    AStar astar = new AStar(open, close);
-                    Node start = getStartNode(nodes);
-                    Node goal = goalNodes.head;
-                    LinkedList path = null;
-                    do {
-                        System.out.println("Start " + start + "TO Goal " + goal);
-                        path = astar.findPath(start, goal);
-
-                        if (path != null && !path.isEmpty()) {
-                            path.print();
-                            System.out.println(path.head);
-                            //System.out.println(path);
-                            this.move(map, path);
-                            this.getAttackType().attack(this, nearUnit[i]);
-                            this.getAttackType().start();
-                            if (nearUnit[i].getHealth() <= 0) {
-                                nearUnit[i].isDead(map.lManager, map.images[8]);
+                            if (path != null && !path.isEmpty()) {
+                                path.print();
+                                System.out.println(path.head);
+                                //System.out.println(path);
+                                this.move(map, path, game);
+                                getAttackType().attack(this, nearUnit[i]);
+                                getAttackType().start();
+                                if (nearUnit[i].getHealth() <= 0) {
+                                    nearUnit[i].isDead(map.lManager, map.images[8]);
+                                }
+                                // endTurn(map.lManager, map.images[3]);
                             }
-                        }
 //                    path.clear();
 //                        open.clear();
 //                        close.clear();
@@ -63,37 +64,39 @@ public class AIUnit extends UnitAbstract {
 //                                nodes[x][y].reset();
 //                            }
 //                        }
-                        goal = goal.next;
-                    } while (path == null);
-                    this.setEndTurn(true);
+                            goal = goal.next;
+                        } while (path == null);
+                        this.setEndTurn(true);
+                    }
                 }
             }
-        }
+            System.out.println("No Near");
         //this.endTurn(map.lManager, map.images[3]);
         return false;
     }
 
-    public boolean move(final RPGMap map, final LinkedList path) {
+    public boolean move(final RPGMap map, final LinkedList path, final GameHandler game) {
         if (path != null) {
             Thread t = new Thread(new Runnable() {
 
                 public void run() {
                     synchronized (map.lManager) {
-                        Node n = path.head;
-                        while (n != null) {
-                            x = n.getX() * 24;
-                            y = n.getY() * 24;
-                            map.setActiveView(x, y);
-                            getSprite().setPosition(x, y);
-                            n = n.next;
-
-                            try {
-                                Thread.sleep(300);
-                            } catch (InterruptedException ex) {
-                                ex.printStackTrace();
+                        synchronized (game) {
+                            Node n = path.head;
+                            while (n != null) {
+                                x = n.getX() * 24;
+                                y = n.getY() * 24;
+                                map.setActiveView(x, y);
+                                getSprite().setPosition(x, y);
+                                n = n.next;
+                                try {
+                                    Thread.sleep(200);
+                                } catch (InterruptedException ex) {
+                                    ex.printStackTrace();
+                                }
                             }
+                            endTurn(map.lManager);
                         }
-                        endTurn(map.lManager, map.images[3]);
                     }
                 }
             });
@@ -116,7 +119,7 @@ public class AIUnit extends UnitAbstract {
         return null;
     }
 
-    public Unit[] getNearUnit(RPGMap map) {
+    private Unit[] getNearUnit(RPGMap map) {
         Unit[] nearUnit = new Unit[map.pl_units.length];
         int range = (this.getAttackType() instanceof RangedAttack) ? this.getMoveSpace() + 2 : this.getMoveSpace() + 1;
         int c = 0;
@@ -143,7 +146,7 @@ public class AIUnit extends UnitAbstract {
         return true;
     }
 
-    public LinkedList createGoalNodes(Unit unit, RPGMap map) {
+    private LinkedList createGoalNodes(Unit unit, RPGMap map) {
 
         LinkedList nodes = new LinkedList();
         if (unit != null) {

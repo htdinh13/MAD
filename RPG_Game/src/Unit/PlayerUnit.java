@@ -13,14 +13,14 @@ public class PlayerUnit extends UnitAbstract {
 
     private int preX, preY;
 
-    public PlayerUnit(int colnum, int rownum, Image img, int moveSpace, Attackable attackType) {
-        super(colnum, rownum, img, moveSpace, attackType);
+    public PlayerUnit(int colnum, int rownum, Image img, Image imgEnd, int moveSpace, Attackable attackType) {
+        super(colnum, rownum, img, imgEnd, moveSpace, attackType);
         this.preX = super.getX();
         this.preY = super.getY();
     }
 
-    public PlayerUnit(int x, int y, Image img, int moveSpace, Attackable attackType, int health, int attack, int defence) {
-        super(x, y, img, moveSpace, attackType, health, attack, defence);
+    public PlayerUnit(int x, int y, Image img, Image imgEnd, int moveSpace, Attackable attackType, int health, int attack, int defence) {
+        super(x, y, img, imgEnd, moveSpace, attackType, health, attack, defence);
         this.preX = super.getX();
         this.preY = super.getY();
     }
@@ -33,7 +33,7 @@ public class PlayerUnit extends UnitAbstract {
         (super.getSprite()).setPosition(x, y);
     }
 
-    public boolean move(final RPGMap map,final LinkedList path) {
+    public boolean move(final RPGMap map, final LinkedList path) {
         this.preX = super.getX();
         this.preY = super.getY();
         return super.move(map, path);

@@ -1,7 +1,3 @@
-/*
- * To change this template, choose Tools | Templates
- * and open the template in the editor.
- */
 package View;
 
 import Algorithm.AStar;
@@ -17,18 +13,18 @@ import Unit.AIUnit;
 import Unit.PlayerUnit;
 import Unit.Unit;
 import java.io.IOException;
-import javax.microedition.lcdui.Graphics;
-import javax.microedition.lcdui.Image;
+import javax.microedition.lcdui.*;
 import javax.microedition.lcdui.game.GameCanvas;
 import javax.microedition.lcdui.game.LayerManager;
 import javax.microedition.lcdui.game.Sprite;
 import javax.microedition.lcdui.game.TiledLayer;
+import javax.microedition.midlet.MIDlet;
 
 /**
  *
  * @author HOANG TRUONG DINH
  */
-public class RPGMap extends GameCanvas implements Runnable {
+public class RPGMap extends GameCanvas implements Runnable, CommandListener {
 
     private int x, y, index;
     public Image[] images;
@@ -63,8 +59,11 @@ public class RPGMap extends GameCanvas implements Runnable {
     private Node start, goal;
     private AStar astar;
     private LinkedList path, openList, closedList;
+    private String statusStr;
     public Thread keyThread;
     GameHandler game;
+    Command cmdMenu, cmdExit;
+    MIDlet mainMidlet;
 
     public void loadImages() throws IOException {
         images = new Image[21];
@@ -73,8 +72,9 @@ public class RPGMap extends GameCanvas implements Runnable {
         }
     }
 
-    public RPGMap(boolean suppressKeyEvents) {
+    public RPGMap(boolean suppressKeyEvents, MIDlet mainMid) {
         super(suppressKeyEvents);
+        this.mainMidlet = mainMid;
         this.x = 0;
         this.y = 0;
         this.index = 0;
@@ -85,6 +85,7 @@ public class RPGMap extends GameCanvas implements Runnable {
         this.ai_units = new Unit[23];
         this.pl_units = new Unit[5];
         this.lManager = new LayerManager();
+        this.statusStr = "";
 
         openList = new LinkedList();
         closedList = new LinkedList();
@@ -131,6 +132,13 @@ public class RPGMap extends GameCanvas implements Runnable {
             }
         });
         keyThread.start();
+
+        cmdMenu = new Command("Menu", Command.BACK, 0);
+        this.addCommand(cmdMenu);
+        cmdExit = new Command("Exit", Command.EXIT, 0);
+        this.addCommand(cmdExit);
+        this.setCommandListener(this);
+
     }
 
     public void createAIUnits() {
@@ -333,7 +341,6 @@ public class RPGMap extends GameCanvas implements Runnable {
         }
         movingLayer.setPosition((col - space) * 24, (row - space) * 24);
         lManager.insert(movingLayer, lManager.getSize() - 1);
-
     }
 
     public void resetMovingCells() {
@@ -408,14 +415,13 @@ public class RPGMap extends GameCanvas implements Runnable {
                 if (!onSelected) {
 
                     selectedUnit = getAIUnit(cursorSpr.getX_(), cursorSpr.getY_());
-                    System.out.println("0 pressed");
                     if (selectedUnit != null) {
-                        System.out.println("AI pressed");
                     } else {
                         selectedUnit = getPLUnit(cursorSpr.getX_(), cursorSpr.getY_());
                     }
                     if (selectedUnit != null && !selectedUnit.getEndTurn()) {
                         createMovingLayer(selectedUnit);
+                        statusStr = selectedUnit.getHealth() + "/" + selectedUnit.getAttack() + "/" + selectedUnit.getDefence();
                     }
                 }
                 break;
@@ -470,6 +476,7 @@ public class RPGMap extends GameCanvas implements Runnable {
                 if (!onSelected) {
                     if (selectedUnit != null && movingLayer != null) {
                         lManager.remove(movingLayer);
+                        statusStr = "";
                     }
                 }
                 break;
@@ -763,8 +770,10 @@ public class RPGMap extends GameCanvas implements Runnable {
         Graphics g = this.getGraphics();
         lManager.setViewWindow(x, y, this.getWidth(), this.getHeight() - 3);
         lManager.paint(g, 0, 0);
-        g.setColor(255, 0, 0);
-        getGraphics().drawString("GAME ", 0, 0, Graphics.TOP | Graphics.LEFT);
+        g.setColor(0xFFFF00);
+        Font font = Font.getFont(g.getFont().getFace(), Font.STYLE_BOLD, g.getFont().getSize() / 2);
+        g.setFont(font);
+        g.drawString("" + statusStr, 0, 0, Graphics.TOP | Graphics.LEFT);
         flushGraphics();
     }
 
@@ -809,5 +818,16 @@ public class RPGMap extends GameCanvas implements Runnable {
             }
         }
         return null;
+    }
+
+    public void commandAction(Command c, Displayable d) {
+        if (c == cmdExit) {
+            mainMidlet.notifyDestroyed();
+        } else if (c == cmdMenu) {
+            MainForm subForm = new MainForm(mainMidlet, ((GameMIDlet) mainMidlet).getmDisplay(), "Options", Choice.IMPLICIT, new String[]{
+                        "Resume", "New Game", "Save Game", "Load Game", "Quit"}, null);
+            subForm.setGame(this);
+            ((GameMIDlet) mainMidlet).getmDisplay().setCurrent(subForm);
+        }
     }
 }

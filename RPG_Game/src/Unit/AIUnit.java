@@ -25,38 +25,41 @@ public class AIUnit extends UnitAbstract {
     }
 
     public boolean live(RPGMap map, GameHandler game) {
-        Unit[] nearUnit = getNearUnit(map);
-        if (!isNearUnitEmpty(nearUnit)) {
-            sortUnitsByHealth(nearUnit);
-            for (int i = 0; i < nearUnit.length && this.getEndTurn() == false; i++) {
-                LinkedList goalNodes = createGoalNodes(nearUnit[i], map);
-                if (!goalNodes.isEmpty()) {
-                    Node nodes[][] = map.createAIMovingNodes(this.getX() / 24, this.getY() / 24, this.getMoveSpace());
-                    LinkedList open = new LinkedList(), close = new LinkedList();
-                    AStar astar = new AStar(open, close);
-                    Node start = getStartNode(nodes);
-                    Node goal = goalNodes.head;
-                    boolean isDone = false;
-                    do {
-                        LinkedList path = astar.findPath(start, goal);
-
-                        if (path != null && !path.isEmpty()) {
-                            this.move(map, path, game);
-                            System.out.println("Attacked " + i + " " + nearUnit[i].getX() + "," + nearUnit[i].getY());
-                            getAttackType().attack(this, nearUnit[i]);
-                            getAttackType().start();
-                            if (nearUnit[i].getHealth() <= 0) {
-                                nearUnit[i].isDead(map.lManager, map.images[8]);
-                            }
-                            this.setEndTurn(true);
-                            isDone = true;
-                        }
-                        goal = goal.next;
-                    } while (!isDone);
-                }
-            }
+        if (this.getHealth() < 10) {
         } else {
-            this.endTurn(map.lManager);
+            Unit[] nearUnit = getNearUnit(map);
+            if (!isNearUnitEmpty(nearUnit)) {
+                sortUnitsByHealth(nearUnit);
+                for (int i = 0; i < nearUnit.length && this.getEndTurn() == false; i++) {
+                    LinkedList goalNodes = createGoalNodes(nearUnit[i], map);
+                    if (!goalNodes.isEmpty()) {
+                        Node nodes[][] = map.createAIMovingNodes(this.getX() / 24, this.getY() / 24, this.getMoveSpace());
+                        LinkedList open = new LinkedList(), close = new LinkedList();
+                        AStar astar = new AStar(open, close);
+                        Node start = getStartNode(nodes);
+                        Node goal = goalNodes.head;
+                        boolean isDone = false;
+                        do {
+                            LinkedList path = astar.findPath(start, goal);
+
+                            if (path != null && !path.isEmpty()) {
+                                this.move(map, path, game);
+                                System.out.println("Attacked " + i + " " + nearUnit[i].getX() + "," + nearUnit[i].getY());
+                                getAttackType().attack(this, nearUnit[i]);
+                                getAttackType().start();
+                                if (nearUnit[i].getHealth() <= 0) {
+                                    nearUnit[i].isDead(map.lManager, map.images[8]);
+                                }
+                                this.setEndTurn(true);
+                                isDone = true;
+                            }
+                            goal = goal.next;
+                        } while (!isDone);
+                    }
+                }
+            } else {
+                this.endTurn(map.lManager);
+            }
         }
         return false;
     }

@@ -6,9 +6,7 @@ import Attack.Attackable;
 import Attack.CavalryAttack;
 import Attack.KnightAttack;
 import Attack.RangedAttack;
-import View.Cursor;
 import View.RPGMap;
-import java.io.IOException;
 import javax.microedition.lcdui.Image;
 import javax.microedition.lcdui.game.LayerManager;
 import javax.microedition.lcdui.game.Sprite;
@@ -19,7 +17,7 @@ public abstract class UnitAbstract implements Unit {
     public int x, y;
     private boolean endTurn;
     private Attackable attackType;
-    public int health, attack, defence, moveSpace;
+    public int maxHealth, health, attack, defence, moveSpace;
 
     public UnitAbstract(int colnum, int rownum, Image img, Image imgEnd,
             int moveSpace, Attackable attackType) {
@@ -32,14 +30,17 @@ public abstract class UnitAbstract implements Unit {
         endTurn = false;
         this.attackType = attackType;
         if (attackType instanceof KnightAttack) {
+            this.maxHealth = 60;
             this.health = 60;
             this.attack = 20;
             this.defence = 15;
         } else if (attackType instanceof RangedAttack) {
+            this.maxHealth = 40;
             this.health = 40;
             this.attack = 25;
             this.defence = 5;
         } else if (attackType instanceof CavalryAttack) {
+            this.maxHealth = 80;
             this.health = 80;
             this.attack = 30;
             this.defence = 10;
@@ -58,6 +59,7 @@ public abstract class UnitAbstract implements Unit {
         endTurn = false;
         this.attackType = attackType;
 
+        this.maxHealth = health;
         this.health = health;
         this.attack = attack;
         this.defence = defence;
@@ -151,7 +153,7 @@ public abstract class UnitAbstract implements Unit {
                         } else {
                             map.movedSpr.setPosition(map.cursorSpr.getX_() + 1, map.cursorSpr.getY_() - 14);
                         }
-                        map.lManager.insert(map.movedSpr, 3);
+                        map.lManager.insert(map.movedSpr, 0);
                     }
                 }
             });
@@ -205,5 +207,17 @@ public abstract class UnitAbstract implements Unit {
         } else {
             this.health -= attacker.getAttack() - this.defence;
         }
+    }
+
+    public int getDefence() {
+        return defence;
+    }
+
+    public void setHealth(int health) {
+        this.health = health;
+    }
+
+    public int getMaxHealth() {
+        return maxHealth;
     }
 }

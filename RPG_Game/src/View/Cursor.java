@@ -29,7 +29,6 @@ public class Cursor extends Sprite {
     }
 
     public Cursor(Image image, int frameWidth, int frameHeight, int x, int y) {
-
         super(image, frameWidth, frameHeight);
         this.x_ = x;
         this.y_ = y;

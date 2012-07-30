@@ -43,4 +43,10 @@ public interface Unit {
     public int getAttack();
 
     public int getHealth();
+
+    public int getDefence();
+
+    public void setHealth(int health);
+    
+    public int getMaxHealth();
 }

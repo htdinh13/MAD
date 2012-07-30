@@ -14,7 +14,7 @@ public class GameHandler implements Runnable {
     public GameHandler(Unit[] aiUnits, Unit[] plUnits, RPGMap map) {
         this.aiUnits = aiUnits;
         this.plUnits = plUnits;
-        highscore = 0; // 1 hour
+        highscore = 100; // 1 hour
         numTurn = 0;
         this.map = map;
         playerTurn = true;
@@ -99,15 +99,27 @@ public class GameHandler implements Runnable {
         playerTurn = true;
     }
 
+    public void checkRecoverHealth(Unit[] units) {
+        for (int i = 0; i < units.length; i++) {
+            int cell = map.backgroundLayer.getCell(units[i].getX() / 24, units[i].getY() / 24);
+            if (cell == 6 || cell == 7) {
+                int h = units[i].getHealth();
+                units[i].setHealth((h + 10 > units[i].getMaxHealth()) ? units[i].getMaxHealth() : h + 10);
+            }
+        }
+    }
+
     public void run() {
         while (!checkGameEnd()) {
             synchronized (this) {
                 if (playerTurn) {
+                    checkRecoverHealth(plUnits);
                     this.PLTurn();
                     while (!checkAllUnitEndTurn(plUnits)) {
                     }
                     playerTurn = false;
                 } else {
+                    checkRecoverHealth(aiUnits);
                     this.AITurn();
                 }
             }

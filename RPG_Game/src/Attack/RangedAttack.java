@@ -4,11 +4,10 @@
  */
 package Attack;
 
-import Attack.AttackAbstract;
 import Model.GameHandler;
 import Unit.Unit;
+import View.RPGMap;
 import javax.microedition.lcdui.Image;
-import javax.microedition.lcdui.game.LayerManager;
 import javax.microedition.lcdui.game.Sprite;
 
 /**
@@ -24,8 +23,8 @@ public class RangedAttack extends AttackAbstract {
         super(img, width, height);
     }
 
-    public RangedAttack(Image img, LayerManager lManager, GameHandler game) {
-        super(img, lManager, game);
+    public RangedAttack(Image img, RPGMap map) {
+        super(img, map);
     }
 
     public void attack(Unit attacker, Unit attacked) {
@@ -70,51 +69,51 @@ public class RangedAttack extends AttackAbstract {
 
         }
         super.getAttackSpr().setPosition(currX, currY);
-        super.getLManager().insert(super.getAttackSpr(), 0);
+        this.map.lManager.insert(super.getAttackSpr(), 0);
     }
 
     public void run() {
-        synchronized (super.getLManager()) {
-            synchronized (super.game) {
-                super.getAttackSpr().setFrame(startFrame);
-                while (!((currX == destX) && (currY == destY))) {
-                    switch (direction) {
-                        case 0:
-                            currY--;
-                            super.getAttackSpr().setPosition(currX, currY);
-                            break;
-                        case 1:
-                            currY++;
-                            super.getAttackSpr().setPosition(currX, currY);
-                            break;
-                        case 2:
-                            currX--;
-                            super.getAttackSpr().setPosition(currX, currY);
-                            break;
-                        case 3:
-                            currX++;
-                            super.getAttackSpr().setPosition(currX, currY);
-                            break;
-                        default:
-                            break;
-                    }
-                    try {
-                        Thread.sleep(20);
-                    } catch (InterruptedException ex) {
-                        ex.printStackTrace();
-                    }
+        synchronized (this.map.lManager) {
+            super.getAttackSpr().setFrame(startFrame);
+            while (!((currX == destX) && (currY == destY))) {
+                switch (direction) {
+                    case 0:
+                        currY--;
+                        super.getAttackSpr().setPosition(currX, currY);
+                        break;
+                    case 1:
+                        currY++;
+                        super.getAttackSpr().setPosition(currX, currY);
+                        break;
+                    case 2:
+                        currX--;
+                        super.getAttackSpr().setPosition(currX, currY);
+                        break;
+                    case 3:
+                        currX++;
+                        super.getAttackSpr().setPosition(currX, currY);
+                        break;
+                    default:
+                        break;
+                }
+                try {
+                    Thread.sleep(20);
+                } catch (InterruptedException ex) {
+                    ex.printStackTrace();
+                }
 
-                }
-                for (int i = 0; i < super.getAttackSpr().getFrameSequenceLength() / 2 - 2; i++) {
-                    super.getAttackSpr().nextFrame();
-                    try {
-                        Thread.sleep(150);
-                    } catch (InterruptedException ex) {
-                        ex.printStackTrace();
-                    }
-                }
-                super.getLManager().remove(super.getAttackSpr());
             }
+            for (int i = 0; i < super.getAttackSpr().getFrameSequenceLength() / 2 - 2; i++) {
+                super.getAttackSpr().nextFrame();
+                try {
+                    Thread.sleep(150);
+                } catch (InterruptedException ex) {
+                    ex.printStackTrace();
+                }
+            }
+            super.getAttackSpr().setVisible(false);
+            this.map.lManager.remove(super.getAttackSpr());
+            this.attacker.endTurn(map.lManager);
         }
     }
 }

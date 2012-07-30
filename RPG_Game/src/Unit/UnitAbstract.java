@@ -113,11 +113,9 @@ public abstract class UnitAbstract implements Unit {
     }
 
     public void newTurn(LayerManager lManager) {
-        endTurn = false;
-        if (endSprite != null) {
-            endSprite.setVisible(false);
-            lManager.remove(endSprite);
-        }
+        this.endTurn = false;
+        this.endSprite.setVisible(false);
+        lManager.remove(endSprite);
     }
 
     public void move(int x, int y) {

@@ -4,11 +4,9 @@
  */
 package Attack;
 
-import Attack.AttackAbstract;
 import Model.GameHandler;
-import Unit.Unit;
+import View.RPGMap;
 import javax.microedition.lcdui.Image;
-import javax.microedition.lcdui.game.LayerManager;
 
 /**
  *
@@ -20,9 +18,7 @@ public class CavalryAttack extends AttackAbstract {
         super(img, width, height);
     }
 
-    public CavalryAttack(Image img, LayerManager lManager, GameHandler game) {
-        super(img,lManager, game);
+    public CavalryAttack(Image img, RPGMap map) {
+        super(img, map);
     }
-
-    
 }

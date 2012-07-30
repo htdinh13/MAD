@@ -1,9 +1,8 @@
 package Attack;
 
 import Model.GameHandler;
-import Unit.Unit;
+import View.RPGMap;
 import javax.microedition.lcdui.Image;
-import javax.microedition.lcdui.game.LayerManager;
 
 /**
  *
@@ -15,7 +14,7 @@ public class KnightAttack extends AttackAbstract {
         super(img, width, height);
     }
 
-    public KnightAttack(Image img,LayerManager lManager,GameHandler game) {
-        super(img,lManager,game);
+    public KnightAttack(Image img,RPGMap map) {
+        super(img,map);
     }    
 }

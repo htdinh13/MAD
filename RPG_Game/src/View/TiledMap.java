@@ -4,7 +4,6 @@ package View;
  *
  * @author Luu Manh 13
  */
-
 import javax.microedition.lcdui.Command;
 import javax.microedition.lcdui.CommandListener;
 import javax.microedition.lcdui.Display;
@@ -14,7 +13,7 @@ import javax.microedition.midlet.MIDletStateChangeException;
 
 public class TiledMap extends MIDlet implements CommandListener {
 
-    private Display mDisplay;    
+    private Display mDisplay;
 
     protected void destroyApp(boolean unconditional) throws MIDletStateChangeException {
     }

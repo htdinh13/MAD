@@ -44,7 +44,6 @@ public class AIUnit extends UnitAbstract {
 
                             if (path != null && !path.isEmpty()) {
                                 this.move(map, path, game);
-                                System.out.println("Attacked " + i + " " + nearUnit[i].getX() + "," + nearUnit[i].getY());
                                 getAttackType().attack(this, nearUnit[i]);
                                 getAttackType().start();
                                 if (nearUnit[i].getHealth() <= 0) {
@@ -69,24 +68,22 @@ public class AIUnit extends UnitAbstract {
             Thread t = new Thread(new Runnable() {
 
                 public void run() {
-                    synchronized (map.lManager) {
-                        synchronized (game) {
-                            Node n = path.head;
-                            while (n != null) {
-                                x = n.getX() * 24;
-                                y = n.getY() * 24;
-                                map.setActiveView(x, y);
-                                getSprite().setPosition(x, y);
-                                n = n.next;
-                                try {
-                                    Thread.sleep(200);
-                                } catch (InterruptedException ex) {
-                                    ex.printStackTrace();
-                                }
-                            }
+                    //  synchronized (map.lManager) {
+                    Node n = path.head;
+                    while (n != null) {
+                        x = n.getX() * 24;
+                        y = n.getY() * 24;
+                        map.setActiveView(x, y);
+                        getSprite().setPosition(x, y);
+                        n = n.next;
+                        try {
+                            Thread.sleep(200);
+                        } catch (InterruptedException ex) {
+                            ex.printStackTrace();
                         }
                     }
                 }
+                //}
             });
             t.start();
             return true;
@@ -117,7 +114,6 @@ public class AIUnit extends UnitAbstract {
                 int x = u.getX();
                 int y = u.getY();
                 if (Math.abs(x / 24 - this.getX() / 24) + Math.abs((y / 24 - this.getY() / 24)) <= range) {
-                    System.out.println("PL UNIT " + i);
                     nearUnit[c] = u;
                     c++;
                 }

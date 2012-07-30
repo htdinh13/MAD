@@ -1,5 +1,12 @@
 package View;
 
+import Attack.Attackable;
+import Attack.CavalryAttack;
+import Attack.KnightAttack;
+import Attack.RangedAttack;
+import Model.DataRecord;
+import Unit.Unit;
+import gov.nist.core.StringTokenizer;
 import javax.microedition.lcdui.*;
 import javax.microedition.midlet.MIDlet;
 
@@ -17,9 +24,10 @@ public class MainForm extends List implements CommandListener {
     Command cmdOK;
     MIDlet mainMidlet;
     Display display;
-    int highscore;
+    int highscore, c;
     String[] stringElements;
-    RPGMap game;
+    RPGMap map;
+    DataRecord dataRecord;
 
     public MainForm(MIDlet mainMidlet, Display display, String title, int listType, String[] stringElements, Image[] imageElements) {
         super(title, listType, stringElements, imageElements);
@@ -32,10 +40,12 @@ public class MainForm extends List implements CommandListener {
         this.setCommandListener(this);
         this.highscore = 0;
         this.stringElements = stringElements;
+        dataRecord = new DataRecord();
     }
 
     public void commandAction(Command c, Displayable d) {
         if (c == cmdExit) {
+            map.soundPlayer.stop();
             mainMidlet.notifyDestroyed();
         } else if (c == cmdOK) {
             onSelected();
@@ -48,17 +58,18 @@ public class MainForm extends List implements CommandListener {
         if (stringElements.length == 4) {
             switch (this.getSelectedIndex()) {
                 case 0:
-                    game = new RPGMap(false, mainMidlet);
-                    display.setCurrent(game);
-                    game.start();
-                    game.game.start();
-                    highscore = game.game.getHighscore();
+                    map = new RPGMap(false, mainMidlet);
+                    display.setCurrent(map);
+                    map.start();
+                    highscore = map.game.getHighscore();
                     break;
                 case 1:
                     System.out.println("Load game");
+                    loadGame();
                     break;
                 case 2:
                     Form highscoreForm = new HighscoreForm(display, this, highscore);
+                    map.soundPlayer.stop();
                     display.setCurrent(highscoreForm);
                     break;
                 case 3:
@@ -70,11 +81,41 @@ public class MainForm extends List implements CommandListener {
         } else {
             switch (this.getSelectedIndex()) {
                 case 0:
-                    if (game != null) {
-                        game.setActiveView(game.pl_units[0].getX(), game.pl_units[0].getY());
-                        game.cursorSpr.move(game.pl_units[0].getX(), game.pl_units[0].getY());
-                        display.setCurrent(game);
+                    if (map != null) {
+                        map.setActiveView(map.pl_units[0].getX(), map.pl_units[0].getY());
+                        map.cursorSpr.move(map.pl_units[0].getX(), map.pl_units[0].getY());
+                        display.setCurrent(map);
+                        map.soundPlayer.start();
                     }
+                    break;
+                case 1:
+                    map = new RPGMap(false, mainMidlet);
+                    display.setCurrent(map);
+                    map.start();
+                    map.game.start();
+                    highscore = map.game.getHighscore();
+                    break;
+
+                case 2:
+                    System.out.println("Save game");
+                    dataRecord.clear();
+                    dataRecord.save(1, map.game.getHighscore() + "");
+                    c = 2;
+                    for (int i = 0; i < map.pl_units.length; i++, c++) {
+                        dataRecord.save(c, i + ":" + map.pl_units[i].toString());
+                    }
+                    for (int i = 0; i < map.ai_units.length; i++, c++) {
+                        dataRecord.save(c, i + ":" + map.ai_units[i].toString());
+                    }
+
+                    break;
+                case 3:
+                    System.out.println("Load game 2");
+                    loadGame();
+                    break;
+                case 4:
+                    map.soundPlayer.close();
+                    mainMidlet.notifyDestroyed();
                     break;
                 default:
                     break;
@@ -83,10 +124,56 @@ public class MainForm extends List implements CommandListener {
     }
 
     public RPGMap getGame() {
-        return game;
+        return map;
     }
 
     public void setGame(RPGMap game) {
-        this.game = game;
+        this.map = game;
+    }
+
+    public void loadUnit(Unit[] units, String record) {
+        StringTokenizer tok = new StringTokenizer(record, ':');
+        while (tok.hasMoreChars()) {
+            int index = intC(tok.nextToken());
+            int x = intC(tok.nextToken());
+            int y = intC(tok.nextToken());
+            int health = intC(tok.nextToken());
+            String endStr = tok.nextToken();
+            boolean endTurn = (endStr.equals("1") ? true : false);
+            units[index].loadUnit(x, y, health, endTurn, map);
+            break;
+        }
+    }
+
+    public void loadGame() {
+        int size = dataRecord.size();
+        if (size > 0) {
+            if (map == null) {
+                map = new RPGMap(false, mainMidlet);
+                display.setCurrent(map);
+                map.start();
+            } else {
+                display.setCurrent(map);
+            }
+            for (int i = 1; i <= size; i++) {
+                String record = dataRecord.load(i);
+                if (i == 1) {
+                    map.game.setHighscore(Integer.parseInt(record));
+                    highscore = map.game.getHighscore();
+                } else if (i <= 6) {
+                    loadUnit(map.pl_units, record);
+                } else {
+                    loadUnit(map.ai_units, record);
+                }
+            }
+            map.setActiveView(map.pl_units[0].getX(), map.pl_units[0].getY());
+            map.cursorSpr.move(map.pl_units[0].getX(), map.pl_units[0].getY());
+        } else {
+            System.out.println("NO SAVE DATA");
+        }
+    }
+
+    public int intC(String token) {
+        return (int) Integer.parseInt(token.substring(0, token.length() - 1));
     }
 }

@@ -47,6 +47,8 @@ public interface Unit {
     public int getDefence();
 
     public void setHealth(int health);
-    
+
     public int getMaxHealth();
+
+    public void loadUnit(int x, int y, int health, boolean endTurn, RPGMap map);
 }

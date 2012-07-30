@@ -28,6 +28,7 @@ public class RangedAttack extends AttackAbstract {
     }
 
     public void attack(Unit attacker, Unit attacked) {
+        this.attacker = attacker;
         if (attacker.getX() == attacked.getX()) {
             direction = (attacker.getY() > attacked.getY()) ? 0 : 1;
             startFrame = 7;
@@ -68,7 +69,8 @@ public class RangedAttack extends AttackAbstract {
                 break;
 
         }
-        super.getAttackSpr().setPosition(currX, currY);
+        attacked.beAttacked(attacker);
+        this.getAttackSpr().setPosition(currX, currY);
         this.map.lManager.insert(super.getAttackSpr(), 0);
     }
 

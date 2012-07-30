@@ -14,15 +14,15 @@ import javax.microedition.lcdui.game.Sprite;
 public abstract class UnitAbstract implements Unit {
 
     private Sprite sprite, endSprite, deadSprite;
-    public int x, y;
+    public int x, y, imgSprIndex;
     private boolean endTurn;
     private Attackable attackType;
     public int maxHealth, health, attack, defence, moveSpace;
 
-    public UnitAbstract(int colnum, int rownum, Image img, Image imgEnd,
-            int moveSpace, Attackable attackType) {
+    public UnitAbstract(int colnum, int rownum, Image img, Image imgEnd, int moveSpace, Attackable attackType) {
         this.x = colnum * 24;
         this.y = rownum * 24;
+        this.imgSprIndex = imgSprIndex;
         this.moveSpace = moveSpace;
         sprite = new Sprite(img, 24, 24);
         sprite.setVisible(true);
@@ -52,6 +52,7 @@ public abstract class UnitAbstract implements Unit {
     public UnitAbstract(int colnum, int rownum, Image img, Image imgEnd, int moveSpace, Attackable attackType, int health, int attack, int defence) {
         this.x = colnum * 24;
         this.y = rownum * 24;
+        this.imgSprIndex = imgSprIndex;
         this.moveSpace = moveSpace;
         sprite = new Sprite(img, 24, 24);
         sprite.setVisible(true);
@@ -219,5 +220,27 @@ public abstract class UnitAbstract implements Unit {
 
     public int getMaxHealth() {
         return maxHealth;
+    }
+
+    public String toString() {
+        return "" + x + ":" + y + ":" + health + ":" + ((endTurn) ? 1 : 0);
+    }
+
+    public void loadUnit(int x, int y, int health, boolean endTurn, RPGMap map) {
+        this.x = x;
+        this.y = y;
+        this.endTurn = endTurn;
+        this.health = health;
+        sprite.setPosition(x, y);
+        this.endTurn = endTurn;
+        endSprite.setVisible(endTurn);
+        endSprite.setPosition(x, y);
+        map.lManager.insert(endSprite, 4);
+        if (this.health <= 0) {
+            sprite.setVisible(false);
+            endSprite.setVisible(false);
+            map.lManager.remove(sprite);
+            map.lManager.remove(endSprite);
+        }
     }
 }

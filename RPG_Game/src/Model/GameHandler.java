@@ -83,17 +83,14 @@ public class GameHandler implements Runnable {
         newTurnAllUnits();
         for (int i = 0; i < aiUnits.length; i++) {
             if (aiUnits[i] != null && aiUnits[i].getHealth() > 0) {
-                synchronized (this) {
-                    map.setActiveView(aiUnits[i].getX(), aiUnits[i].getY());
-                    ((AIUnit) aiUnits[i]).live(map, this);
-                    //aiUnits[i].endTurn(map.lManager);
-                    try {
-                        Thread.sleep(100);
-                    } catch (InterruptedException ex) {
-                        ex.printStackTrace();
-                    }
+                map.setActiveView(aiUnits[i].getX(), aiUnits[i].getY());
+                ((AIUnit) aiUnits[i]).live(map, this);
+                //aiUnits[i].endTurn(map.lManager);
+                try {
+                    Thread.sleep(100);
+                } catch (InterruptedException ex) {
+                    ex.printStackTrace();
                 }
-
             }
         }
         playerTurn = true;
@@ -111,23 +108,27 @@ public class GameHandler implements Runnable {
 
     public void run() {
         while (!checkGameEnd()) {
-            synchronized (this) {
-                if (playerTurn) {
-                    checkRecoverHealth(plUnits);
-                    this.PLTurn();
-                    while (!checkAllUnitEndTurn(plUnits)) {
-                    }
-                    playerTurn = false;
-                } else {
-                    checkRecoverHealth(aiUnits);
-                    this.AITurn();
+//            synchronized (this) {
+            if (playerTurn) {
+                checkRecoverHealth(plUnits);
+                this.PLTurn();
+                while (!checkAllUnitEndTurn(plUnits)) {
                 }
+                playerTurn = false;
+            } else {
+                checkRecoverHealth(aiUnits);
+                this.AITurn();
             }
+//            }
         }
     }
 
     public void start() {
         Thread t = new Thread(this);
         t.start();
+    }
+
+    public void setHighscore(int highscore) {
+        this.highscore = highscore;
     }
 }

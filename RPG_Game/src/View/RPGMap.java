@@ -9,6 +9,7 @@ import Attack.CavalryAttack;
 import Attack.KnightAttack;
 import Attack.RangedAttack;
 import Model.GameHandler;
+import Model.SoundPlayer;
 import Unit.AIUnit;
 import Unit.PlayerUnit;
 import Unit.Unit;
@@ -26,6 +27,7 @@ import javax.microedition.midlet.MIDlet;
  */
 public class RPGMap extends GameCanvas implements Runnable, CommandListener {
 
+    public SoundPlayer soundPlayer;
     private int x, y, index;
     public Image[] images;
     public Cursor cursorSpr;
@@ -132,6 +134,10 @@ public class RPGMap extends GameCanvas implements Runnable, CommandListener {
             }
         });
         keyThread.start();
+
+
+        soundPlayer = new SoundPlayer();
+        soundPlayer.start();
 
         cmdMenu = new Command("Menu", Command.BACK, 0);
         this.addCommand(cmdMenu);
@@ -771,7 +777,7 @@ public class RPGMap extends GameCanvas implements Runnable, CommandListener {
         lManager.setViewWindow(x, y, this.getWidth(), this.getHeight() - 3);
         lManager.paint(g, 0, 0);
         g.setColor(0xFFFF00);
-        Font font = Font.getFont(g.getFont().getFace(), Font.STYLE_BOLD, g.getFont().getSize() / 2);
+        Font font = Font.getFont(g.getFont().getFace(), Font.STYLE_BOLD, g.getFont().getSize());
         g.setFont(font);
         g.drawString("" + statusStr, 0, 0, Graphics.TOP | Graphics.LEFT);
         flushGraphics();
@@ -786,6 +792,7 @@ public class RPGMap extends GameCanvas implements Runnable, CommandListener {
         while (true) {
             if (game.checkGameEnd()) {
                 System.out.println("Finish");
+                soundPlayer.stop();
                 break;
             }
             animationUnits();
@@ -822,8 +829,11 @@ public class RPGMap extends GameCanvas implements Runnable, CommandListener {
 
     public void commandAction(Command c, Displayable d) {
         if (c == cmdExit) {
+            soundPlayer.close();
             mainMidlet.notifyDestroyed();
         } else if (c == cmdMenu) {
+
+            soundPlayer.stop();
             MainForm subForm = new MainForm(mainMidlet, ((GameMIDlet) mainMidlet).getmDisplay(), "Options", Choice.IMPLICIT, new String[]{
                         "Resume", "New Game", "Save Game", "Load Game", "Quit"}, null);
             subForm.setGame(this);

@@ -1,10 +1,4 @@
 package View;
-
-/**
- *
- * @author Luu Manh 13
- */
-import Model.SoundPlayer;
 import javax.microedition.lcdui.*;
 import javax.microedition.midlet.MIDlet;
 import javax.microedition.midlet.MIDletStateChangeException;

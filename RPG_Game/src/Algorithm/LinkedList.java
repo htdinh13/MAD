@@ -1,4 +1,3 @@
-
 package Algorithm;
 
 public class LinkedList {

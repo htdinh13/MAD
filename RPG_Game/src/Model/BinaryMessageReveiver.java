@@ -1,6 +1,5 @@
 package Model;
 
-import View.GameMIDlet;
 import View.HighscoreForm;
 import java.io.IOException;
 import javax.microedition.io.Connector;
@@ -41,8 +40,6 @@ public class BinaryMessageReveiver implements Runnable {
             } catch (IOException ex) {
                 ex.printStackTrace();
             }
-
         }
-
     }
 }

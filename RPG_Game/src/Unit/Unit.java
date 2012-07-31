@@ -2,16 +2,11 @@ package Unit;
 
 import Algorithm.LinkedList;
 import Attack.Attackable;
-import View.Cursor;
 import View.RPGMap;
 import javax.microedition.lcdui.Image;
 import javax.microedition.lcdui.game.LayerManager;
 import javax.microedition.lcdui.game.Sprite;
 
-/**
- *
- * @author HOANG TRUONG DINH
- */
 public interface Unit {
 
     public Sprite getSprite();

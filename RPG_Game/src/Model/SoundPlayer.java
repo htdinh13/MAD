@@ -1,7 +1,3 @@
-/*
- * To change this template, choose Tools | Templates
- * and open the template in the editor.
- */
 package Model;
 
 import java.io.IOException;
@@ -10,10 +6,6 @@ import javax.microedition.media.Manager;
 import javax.microedition.media.MediaException;
 import javax.microedition.media.Player;
 
-/**
- *
- * @author kem
- */
 public class SoundPlayer {
 
     Player player;

@@ -1,15 +1,7 @@
-/*
- * To change this template, choose Tools | Templates
- * and open the template in the editor.
- */
 package Model;
 
 import javax.microedition.rms.*;
 
-/**
- *
- * @author kem
- */
 public class DataRecord {
 
     private RecordStore rs;

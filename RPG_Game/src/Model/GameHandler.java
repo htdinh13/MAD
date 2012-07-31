@@ -94,16 +94,6 @@ public class GameHandler implements Runnable {
                     Thread t = new Thread(((AIUnit) aiUnits[i]));
                     ts[i] = t;
                     t.join();
-
-
-
-                    //                ((AIUnit) aiUnits[i]).live(map, this);
-                    //                aiUnits[i].endTurn(map.lManager);
-//                    try {
-//                        Thread.sleep(100);
-//                    } catch (InterruptedException ex) {
-//                        ex.printStackTrace();
-//                    }
                 } catch (InterruptedException ex) {
                     ex.printStackTrace();
                 }
@@ -114,6 +104,7 @@ public class GameHandler implements Runnable {
                 synchronized (this) {
                     synchronized (map.lManager) {
                         ts[i].start();
+                        
                     }
                 }
             }
@@ -138,7 +129,6 @@ public class GameHandler implements Runnable {
 
     public void run() {
         while (!checkGameEnd()) {
-//            synchronized (this) {
             if (playerTurn) {
                 checkRecoverHealth(plUnits);
                 this.PLTurn();
@@ -149,7 +139,6 @@ public class GameHandler implements Runnable {
                 checkRecoverHealth(aiUnits);
                 this.AITurn();
             }
-//            }
         }
         Form highscoreForm = ((GameMIDlet) map.mainMidlet).getMainForm().highscoreForm;
         if (highscoreForm == null) {

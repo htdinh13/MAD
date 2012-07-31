@@ -7,14 +7,6 @@ import javax.microedition.lcdui.*;
 import javax.wireless.messaging.BinaryMessage;
 import javax.wireless.messaging.MessageConnection;
 
-/*
- * To change this template, choose Tools | Templates and open the template in
- * the editor.
- */
-/**
- *
- * @author Luu Manh 13
- */
 public class HighscoreForm extends Form implements CommandListener, Runnable {
 
     MessageConnection conn;

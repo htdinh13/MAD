@@ -5,10 +5,6 @@ import Attack.Attackable;
 import View.RPGMap;
 import javax.microedition.lcdui.Image;
 
-/**
- *
- * @author HOANG TRUONG DINH
- */
 public class PlayerUnit extends UnitAbstract {
 
     private int preX, preY;

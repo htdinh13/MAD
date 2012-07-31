@@ -10,20 +10,23 @@ import Model.GameHandler;
 import View.RPGMap;
 import javax.microedition.lcdui.Image;
 
-/**
- *
- * @author HOANG TRUONG DINH
- */
 public class AIUnit extends UnitAbstract implements Runnable {
+
+    private int gridCols, gridRows;
+    private Node[][] nodes;
+    public RPGMap map;
 
     public AIUnit(int colnum, int rownum, Image img, Image imgEnd, int moveSpace, Attackable attackType) {
         super(colnum, rownum, img, imgEnd, moveSpace, attackType);
+        gridCols = 0;
+        gridRows = 0;
     }
 
     public AIUnit(int x, int y, Image img, Image imgEnd, int moveSpace, Attackable attackType, int health, int attack, int defence) {
         super(x, y, img, imgEnd, moveSpace, attackType, health, attack, defence);
+        gridCols = 0;
+        gridRows = 0;
     }
-    public RPGMap map;
 
     public void setMap(RPGMap map) {
         this.map = map;
@@ -39,28 +42,35 @@ public class AIUnit extends UnitAbstract implements Runnable {
                 for (int i = 0; i < nearUnit.length && this.getEndTurn() == false; i++) {
                     LinkedList goalNodes = createGoalNodes(nearUnit[i], map);
                     if (!goalNodes.isEmpty()) {
-                        Node nodes[][] = map.createAIMovingNodes(this.getX() / 24, this.getY() / 24, this.getMoveSpace());
+                        nodes = createAIMovingNodes(this.getX() / 24, this.getY() / 24, this.getMoveSpace());
                         LinkedList open = new LinkedList(), close = new LinkedList();
                         AStar astar = new AStar(open, close);
                         Node start = getStartNode(nodes);
                         Node goal = goalNodes.head;
+                        LinkedList path = null;
                         boolean isDone = false;
-                        do {
-                            LinkedList path = astar.findPath(start, goal);
-
+                        while (goal != null && !isDone) {
+                            path = astar.findPath(start, goal);
                             if (path != null && !path.isEmpty()) {
-                                this.move(map, path, game);
-                                getAttackType().attack(this, nearUnit[i]);
-                                getAttackType().start();
-                                if (nearUnit[i].getHealth() <= 0) {
-                                    nearUnit[i].isDead(map.lManager, map.images[8]);
-                                }
-                                this.setEndTurn(true);
-                                isDone = true;
+                                break;
                             }
+                            reset(nodes);
+                            open.clear();
+                            close.clear();
                             goal = goal.next;
-                        } while (!isDone);
+                        }
 
+                        if (path != null && !path.isEmpty()) {
+                            path.print();
+                            this.move(map, path);
+                            getAttackType().attack(this, nearUnit[i]);
+                            getAttackType().start();
+                            if (nearUnit[i].getHealth() <= 0) {
+                                nearUnit[i].isDead(map.lManager, map.images[8]);
+                            }
+                            this.setEndTurn(true);
+                            isDone = true;
+                        }
                     }
                 }
             } else {
@@ -70,7 +80,7 @@ public class AIUnit extends UnitAbstract implements Runnable {
         return false;
     }
 
-    public boolean move(final RPGMap map, final LinkedList path, final GameHandler game) {
+    public boolean move(final RPGMap map, final LinkedList path) {
         if (path != null) {
             Thread t = new Thread(new Runnable() {
 
@@ -152,6 +162,7 @@ public class AIUnit extends UnitAbstract implements Runnable {
                             addNode(nodes, map, x + g, y + h);
                         }
                     } else if (Math.abs((g + h) % 2) == 1) {
+
                         addNode(nodes, map, x + g, y + h);
                     }
                 }
@@ -161,10 +172,13 @@ public class AIUnit extends UnitAbstract implements Runnable {
     }
 
     private void addNode(LinkedList nodes, RPGMap map, int x, int y) {
+
         if (map.getUnit(x * 24, y * 24) == null) {
             if (map.backgroundLayer.getCell(x, y) < 10) {
                 nodes.add(new Node(new Cell(x, y)));
             }
+        } else if (x * 24 == this.x && y * 24 == this.y) {
+            nodes.add(new Node(new Cell(x, y)));
         }
     }
 
@@ -184,5 +198,66 @@ public class AIUnit extends UnitAbstract implements Runnable {
 
     public void run() {
         this.live(map, map.game);
+    }
+
+    public Node[][] createAIMovingNodes(int col, int row, int space) {
+        gridCols = space * 2 + 1;
+        gridRows = space * 2 + 1;
+        Node[][] aiMovingCells = new Node[gridCols][gridRows];
+        for (int i = 0; i < gridCols; i++) {
+            for (int j = 0; j < gridRows; j++) {
+                int a = i + col - space, b = j + row - space;
+                if (!(j == space && i == space) && ((i <= space) && (j >= space - i) && (j <= space + i) || ((i > space) && (j >= i - space) && (j < space * 2 + 1 - i + space)))) {
+                    if (a >= 0 && b >= 0 && a < 25 && b < 15) {
+                        if (map.backgroundLayer.getCell(a, b) < 10) {
+                            if (map.getAIUnit(a * 24, b * 24) == null) {
+                                if (map.getPLUnit(a * 24, b * 24) == null) {
+                                    aiMovingCells[i][j] = new Node(new Cell(a, b));
+                                } else {
+                                    aiMovingCells[i][j] = new Node(new Cell(a, b, false));
+                                }
+                            } else {
+                                aiMovingCells[i][j] = new Node(new Cell(a, b));
+                            }
+                        } else {
+                            aiMovingCells[i][j] = new Node(new Cell(a, b, false));
+                        }
+                    } else {
+                        aiMovingCells[i][j] = new Node(new Cell(a, b, false));
+                    }
+                } else {
+                    if (j == space && i == space) {
+                        aiMovingCells[i][j] = new Node(new Cell(a, b));
+                    } else {
+                        aiMovingCells[i][j] = new Node(new Cell(a, b, false));
+                    }
+                }
+            }
+        }
+        for (int x = 0; x < gridCols; x++) {
+            for (int y = 0; y < gridRows; y++) {
+                if (y - 1 >= 0) {
+                    aiMovingCells[x][y].getNeighbours()[0] = aiMovingCells[x][y - 1];
+                }
+                if (x + 1 < gridCols) {
+                    aiMovingCells[x][y].getNeighbours()[1] = aiMovingCells[x + 1][y];
+                }
+                if (y + 1 < gridRows) {
+                    aiMovingCells[x][y].getNeighbours()[2] = aiMovingCells[x][y + 1];
+                }
+                if (x - 1 >= 0) {
+                    aiMovingCells[x][y].getNeighbours()[3] = aiMovingCells[x - 1][y];
+                }
+            }
+        }
+        return aiMovingCells;
+    }
+
+    public void reset(Node[][] nodes) {
+        for (int x = 0; x < gridCols; x++) {
+            for (int y = 0; y < gridRows; y++) {
+                nodes[x][y].reset();
+            }
+        }
     }
 }

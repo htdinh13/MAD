@@ -48,14 +48,9 @@ public class AStar {
         }
     }
 
-    public LinkedList findPath(Node start, Node goal) {
-        //this.reset();
+    public LinkedList findPath(Node start, Node goalNode) {
         this.start = start;
-        this.goal = goal;
-        return startSearch(start, goal);
-    }
-
-    protected LinkedList startSearch(Node start, Node goal) {
+        this.goal = new Node(new Cell(goalNode.data.getX(),goalNode.data.getY()));
         start.setParent(null);
         start.estimatedCostToGoal = start.getEstimatedCostTo(goal);
         start.costFromStart = 0;
@@ -78,7 +73,7 @@ public class AStar {
                                 neighbour.setParent(node);
                             }
                             neighbour.costFromStart = costFromStart;
-                            neighbour.estimatedCostToGoal = neighbour.getEstimatedCostTo(goal);
+                            neighbour.estimatedCostToGoal = neighbour.getEstimatedCostTo(goalNode);
                             if (inClosed) {
                                 closed.remove(neighbour);
                             }
@@ -93,4 +88,43 @@ public class AStar {
         }
         return null;
     }
+
+//    protected LinkedList startSearch(Node start, Node goal) {
+//        start.setParent(null);
+//        start.estimatedCostToGoal = start.getEstimatedCostTo(goal);
+//        start.costFromStart = 0;
+//        open.add(start);
+//        while (!open.isEmpty()) {
+//            Node node = open.removeFirst();
+//            node.setVisited(true);
+//
+//            if (node.compareTo(goal) == 0) {
+//                return constructPath(node);
+//            } else {
+//                for (int i = 0; i < node.getNeighbours().length; i++) {
+//                    Node neighbour = node.getNeighbours()[i];
+//                    if (neighbour != null && !neighbour.isBlocked()) {
+//                        int costFromStart = node.costFromStart + node.getCost();
+//                        boolean inClosed = closed.contains(neighbour);
+//                        boolean inOpen = open.contains(neighbour);
+//                        if ((!inOpen && !inClosed) || costFromStart < neighbour.costFromStart) {
+//                            if (!neighbour.visited) {
+//                                neighbour.setParent(node);
+//                            }
+//                            neighbour.costFromStart = costFromStart;
+//                            neighbour.estimatedCostToGoal = neighbour.getEstimatedCostTo(goal);
+//                            if (inClosed) {
+//                                closed.remove(neighbour);
+//                            }
+//                            if (!inOpen) {
+//                                open.add(neighbour);
+//                            }
+//                        }
+//                    }
+//                }
+//                closed.add(node);
+//            }
+//        }
+//        return null;
+//    }
 }

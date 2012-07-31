@@ -10,14 +10,6 @@ import gov.nist.core.StringTokenizer;
 import javax.microedition.lcdui.*;
 import javax.microedition.midlet.MIDlet;
 
-/*
- * To change this template, choose Tools | Templates and open the template in
- * the editor.
- */
-/**
- *
- * @author Luu Manh 13
- */
 public class MainForm extends List implements CommandListener {
 
     Command cmdExit;
@@ -110,7 +102,6 @@ public class MainForm extends List implements CommandListener {
                     for (int i = 0; i < map.ai_units.length; i++, c++) {
                         dataRecord.save(c, i + ":" + map.ai_units[i].toString());
                     }
-
                     break;
                 case 3:
                     loadGame();

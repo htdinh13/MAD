@@ -5,10 +5,6 @@ import View.RPGMap;
 import javax.microedition.lcdui.Image;
 import javax.microedition.lcdui.game.Sprite;
 
-/**
- *
- * @author HOANG TRUONG DINH
- */
 public abstract class AttackAbstract implements Attackable, Runnable {
 
     private Sprite attackSpr;

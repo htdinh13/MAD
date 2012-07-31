@@ -21,10 +21,6 @@ import javax.microedition.lcdui.game.Sprite;
 import javax.microedition.lcdui.game.TiledLayer;
 import javax.microedition.midlet.MIDlet;
 
-/**
- *
- * @author HOANG TRUONG DINH
- */
 public class RPGMap extends GameCanvas implements Runnable, CommandListener {
 
     public SoundPlayer soundPlayer;
@@ -134,22 +130,17 @@ public class RPGMap extends GameCanvas implements Runnable, CommandListener {
             }
         });
         keyThread.start();
-
-
         soundPlayer = new SoundPlayer();
         soundPlayer.start();
-
         cmdMenu = new Command("Menu", Command.BACK, 0);
         this.addCommand(cmdMenu);
         cmdExit = new Command("Exit", Command.EXIT, 0);
         this.addCommand(cmdExit);
         this.setCommandListener(this);
-
     }
 
     public void createAIUnits() {
-        ai_units[0] = new AIUnit(3, 4, images[14], images[3], 5, new CavalryAttack(images[5], this));
-        // ai_units[0] = new AIUnit(10, 2, images[14],images[3], 5, new CavalryAttack(images[5], this));
+        ai_units[0] = new AIUnit(10, 2, images[14],images[3], 5, new CavalryAttack(images[5], this));
         ai_units[1] = new AIUnit(10, 3, images[14], images[3], 5, new CavalryAttack(images[5], this));
         ai_units[2] = new AIUnit(11, 2, images[14], images[3], 5, new CavalryAttack(images[5], this));
         ai_units[3] = new AIUnit(11, 3, images[14], images[3], 5, new CavalryAttack(images[5], this));
@@ -174,7 +165,7 @@ public class RPGMap extends GameCanvas implements Runnable, CommandListener {
         ai_units[22] = new AIUnit(22, 12, images[13], images[3], 4, new KnightAttack(images[4], this));
         for (int i = 0; i < ai_units.length; i++) {
             if (ai_units[i] != null) {
-                lManager.append(ai_units[i].getSprite());                
+                lManager.append(ai_units[i].getSprite());
             }
         }
     }
@@ -190,7 +181,6 @@ public class RPGMap extends GameCanvas implements Runnable, CommandListener {
                 lManager.append(pl_units[i].getSprite());
             }
         }
-        //pl_units[2].isDead(lManager, images[8]);
     }
 
     public void animationUnits() {
@@ -268,58 +258,7 @@ public class RPGMap extends GameCanvas implements Runnable, CommandListener {
         return movingCells;
     }
 
-    public Node[][] createAIMovingNodes(int col, int row, int space) {
-        int _gridCols = space * 2 + 1;
-        int _gridRows = space * 2 + 1;
-        Node[][] movingCells = new Node[_gridCols][_gridRows];
-        for (int i = 0; i < _gridCols; i++) {
-            for (int j = 0; j < _gridRows; j++) {
-                int a = i + col - space, b = j + row - space;
-                if (!(j == space && i == space) && ((i <= space) && (j >= space - i) && (j <= space + i) || ((i > space) && (j >= i - space) && (j < space * 2 + 1 - i + space)))) {
-                    if (a >= 0 && b >= 0 && a < 25 && b < 15) {
-                        if (backgroundLayer.getCell(a, b) < 10) {
-                            if (getAIUnit(a * 24, b * 24) == null) {
-                                if (getPLUnit(a * 24, b * 24) == null) {
-                                    movingCells[i][j] = new Node(new Cell(a, b));
-                                } else {
-                                    movingCells[i][j] = new Node(new Cell(a, b, false));
-                                }
-                            } else {
-                                movingCells[i][j] = new Node(new Cell(a, b));
-                            }
-                        } else {
-                            movingCells[i][j] = new Node(new Cell(a, b, false));
-                        }
-                    } else {
-                        movingCells[i][j] = new Node(new Cell(a, b, false));
-                    }
-                } else {
-                    if (j == space && i == space) {
-                        movingCells[i][j] = new Node(new Cell(a, b));
-                    } else {
-                        movingCells[i][j] = new Node(new Cell(a, b, false));
-                    }
-                }
-            }
-        }
-        for (int x = 0; x < _gridCols; x++) {
-            for (int y = 0; y < _gridRows; y++) {
-                if (y - 1 >= 0) {
-                    movingCells[x][y].getNeighbours()[0] = movingCells[x][y - 1];
-                }
-                if (x + 1 < _gridCols) {
-                    movingCells[x][y].getNeighbours()[1] = movingCells[x + 1][y];
-                }
-                if (y + 1 < _gridRows) {
-                    movingCells[x][y].getNeighbours()[2] = movingCells[x][y + 1];
-                }
-                if (x - 1 >= 0) {
-                    movingCells[x][y].getNeighbours()[3] = movingCells[x - 1][y];
-                }
-            }
-        }
-        return movingCells;
-    }
+    
 
     public void createMovingLayer(Unit selectedUnit) {
         int col = selectedUnit.getX() / 24;

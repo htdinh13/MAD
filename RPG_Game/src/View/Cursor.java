@@ -1,17 +1,8 @@
 package View;
 
-/*
- * To change this template, choose Tools | Templates
- * and open the template in the editor.
- */
-
 import javax.microedition.lcdui.Image;
 import javax.microedition.lcdui.game.Sprite;
 
-/**
- *
- * @author Luu Manh 13
- */
 public class Cursor extends Sprite {
 
     private int x_, y_;

@@ -1,7 +1,3 @@
-/*
- * To change this template, choose Tools | Templates
- * and open the template in the editor.
- */
 package Attack;
 
 import Model.GameHandler;
@@ -10,10 +6,6 @@ import View.RPGMap;
 import javax.microedition.lcdui.Image;
 import javax.microedition.lcdui.game.Sprite;
 
-/**
- *
- * @author HOANG TRUONG DINH
- */
 public class RangedAttack extends AttackAbstract {
 
     private int direction, startFrame;

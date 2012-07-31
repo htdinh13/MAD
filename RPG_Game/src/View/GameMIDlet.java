@@ -9,10 +9,10 @@ import javax.microedition.lcdui.*;
 import javax.microedition.midlet.MIDlet;
 import javax.microedition.midlet.MIDletStateChangeException;
 
-public class GameMIDlet extends MIDlet{
+public class GameMIDlet extends MIDlet {
 
     private Display mDisplay;
-    private MainForm mainForm;
+    public MainForm mainForm, subForm;
 
     public GameMIDlet() {
         mDisplay = Display.getDisplay(this);
@@ -36,6 +36,4 @@ public class GameMIDlet extends MIDlet{
     public MainForm getMainForm() {
         return mainForm;
     }
-    
-    
 }

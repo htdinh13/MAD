@@ -28,6 +28,7 @@ public class MainForm extends List implements CommandListener {
     String[] stringElements;
     RPGMap map;
     DataRecord dataRecord;
+    Form highscoreForm;
 
     public MainForm(MIDlet mainMidlet, Display display, String title, int listType, String[] stringElements, Image[] imageElements) {
         super(title, listType, stringElements, imageElements);
@@ -45,7 +46,7 @@ public class MainForm extends List implements CommandListener {
 
     public void commandAction(Command c, Displayable d) {
         if (c == cmdExit) {
-            map.soundPlayer.stop();
+            // map.soundPlayer.stop();
             mainMidlet.notifyDestroyed();
         } else if (c == cmdOK) {
             onSelected();
@@ -64,12 +65,14 @@ public class MainForm extends List implements CommandListener {
                     highscore = map.game.getHighscore();
                     break;
                 case 1:
-                    System.out.println("Load game");
                     loadGame();
                     break;
                 case 2:
-                    Form highscoreForm = new HighscoreForm(display, this, highscore);
-                    map.soundPlayer.stop();
+                    if (highscoreForm == null) {
+                        highscoreForm = new HighscoreForm(display, this, highscore);
+                    } else {
+                        ((HighscoreForm) highscoreForm).setHighscore(highscore);
+                    }
                     display.setCurrent(highscoreForm);
                     break;
                 case 3:
@@ -97,7 +100,6 @@ public class MainForm extends List implements CommandListener {
                     break;
 
                 case 2:
-                    System.out.println("Save game");
                     dataRecord.clear();
                     dataRecord.save(1, map.game.getHighscore() + "");
                     c = 2;
@@ -110,12 +112,10 @@ public class MainForm extends List implements CommandListener {
 
                     break;
                 case 3:
-                    System.out.println("Load game 2");
                     loadGame();
                     break;
                 case 4:
-                    map.soundPlayer.close();
-                    mainMidlet.notifyDestroyed();
+                    display.setCurrent(((GameMIDlet) mainMidlet).mainForm);
                     break;
                 default:
                     break;

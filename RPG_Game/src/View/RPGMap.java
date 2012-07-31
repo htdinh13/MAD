@@ -835,8 +835,9 @@ public class RPGMap extends GameCanvas implements Runnable, CommandListener {
 
             soundPlayer.stop();
             MainForm subForm = new MainForm(mainMidlet, ((GameMIDlet) mainMidlet).getmDisplay(), "Options", Choice.IMPLICIT, new String[]{
-                        "Resume", "New Game", "Save Game", "Load Game", "Quit"}, null);
+                        "Resume", "New Game", "Save Game", "Load Game", "End Game"}, null);
             subForm.setGame(this);
+            ((GameMIDlet) mainMidlet).subForm = subForm;
             ((GameMIDlet) mainMidlet).getmDisplay().setCurrent(subForm);
         }
     }

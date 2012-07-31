@@ -197,7 +197,7 @@ public abstract class UnitAbstract implements Unit {
         });
         t.start();
         endSprite.setVisible(false);
-        deadSprite.setVisible(false);
+        //deadSprite.setVisible(false);
     }
 
     public void beAttacked(Unit attacker) {

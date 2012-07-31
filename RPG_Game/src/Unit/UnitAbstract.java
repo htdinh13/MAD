@@ -180,7 +180,7 @@ public abstract class UnitAbstract implements Unit {
 
             public void run() {
                 synchronized (lManager) {
-                    lManager.insert(deadSprite, 4);
+                    lManager.insert(deadSprite, 0);
                     for (int i = 0; i < 8; i++) {
                         deadSprite.nextFrame();
                         sprite.setVisible(i % 2 == 0);

@@ -14,7 +14,7 @@ import javax.microedition.lcdui.Image;
  *
  * @author HOANG TRUONG DINH
  */
-public class AIUnit extends UnitAbstract {
+public class AIUnit extends UnitAbstract implements Runnable{
 
     public AIUnit(int colnum, int rownum, Image img, Image imgEnd, int moveSpace, Attackable attackType) {
         super(colnum, rownum, img, imgEnd, moveSpace, attackType);
@@ -23,8 +23,15 @@ public class AIUnit extends UnitAbstract {
     public AIUnit(int x, int y, Image img, Image imgEnd, int moveSpace, Attackable attackType, int health, int attack, int defence) {
         super(x, y, img, imgEnd, moveSpace, attackType, health, attack, defence);
     }
+    
+    public RPGMap map;
 
+    public void setMap(RPGMap map) {
+        this.map = map;
+    }  
+    
     public boolean live(RPGMap map, GameHandler game) {
+        map.setActiveView(this.getX(), this.getY());
         if (this.getHealth() < 10) {
         } else {
             Unit[] nearUnit = getNearUnit(map);
@@ -54,6 +61,7 @@ public class AIUnit extends UnitAbstract {
                             }
                             goal = goal.next;
                         } while (!isDone);
+
                     }
                 }
             } else {
@@ -68,22 +76,22 @@ public class AIUnit extends UnitAbstract {
             Thread t = new Thread(new Runnable() {
 
                 public void run() {
-                    //  synchronized (map.lManager) {
-                    Node n = path.head;
-                    while (n != null) {
-                        x = n.getX() * 24;
-                        y = n.getY() * 24;
-                        map.setActiveView(x, y);
-                        getSprite().setPosition(x, y);
-                        n = n.next;
-                        try {
-                            Thread.sleep(200);
-                        } catch (InterruptedException ex) {
-                            ex.printStackTrace();
+                    synchronized (map.lManager) {
+                        Node n = path.head;
+                        while (n != null) {
+                            x = n.getX() * 24;
+                            y = n.getY() * 24;
+                            map.setActiveView(x, y);
+                            getSprite().setPosition(x, y);
+                            n = n.next;
+                            try {
+                                Thread.sleep(200);
+                            } catch (InterruptedException ex) {
+                                ex.printStackTrace();
+                            }
                         }
                     }
                 }
-                //}
             });
             t.start();
             return true;
@@ -173,5 +181,9 @@ public class AIUnit extends UnitAbstract {
                 }
             }
         }
+    }
+
+    public void run() {
+        this.live(map, map.game);
     }
 }

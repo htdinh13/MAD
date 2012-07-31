@@ -28,7 +28,7 @@ public class MainForm extends List implements CommandListener {
     String[] stringElements;
     RPGMap map;
     DataRecord dataRecord;
-    Form highscoreForm;
+    public Form highscoreForm;
 
     public MainForm(MIDlet mainMidlet, Display display, String title, int listType, String[] stringElements, Image[] imageElements) {
         super(title, listType, stringElements, imageElements);
@@ -62,6 +62,7 @@ public class MainForm extends List implements CommandListener {
                     map = new RPGMap(false, mainMidlet);
                     display.setCurrent(map);
                     map.start();
+                    map.game.start();
                     highscore = map.game.getHighscore();
                     break;
                 case 1:
@@ -152,6 +153,7 @@ public class MainForm extends List implements CommandListener {
                 map = new RPGMap(false, mainMidlet);
                 display.setCurrent(map);
                 map.start();
+                map.game.start();
             } else {
                 display.setCurrent(map);
             }

@@ -2,7 +2,10 @@ package Model;
 
 import Unit.AIUnit;
 import Unit.Unit;
+import View.GameMIDlet;
+import View.HighscoreForm;
 import View.RPGMap;
+import javax.microedition.lcdui.Form;
 
 public class GameHandler implements Runnable {
 
@@ -46,11 +49,11 @@ public class GameHandler implements Runnable {
     }
 
     public boolean checkGameEnd() {
-        if (plUnits[0] == null && plUnits[0].getHealth() <= 0) {
+        if (plUnits[0] == null || plUnits[0].getHealth() <= 0) {
             isWon = false;
             return true;
         }
-        if (aiUnits[20] == null && aiUnits[20].getHealth() <= 0) {
+        if (aiUnits[20] == null || aiUnits[20].getHealth() <= 0) {
             isWon = true;
             return true;
         }
@@ -77,20 +80,47 @@ public class GameHandler implements Runnable {
         newTurnAllUnits();
         numTurn++;
     }
+    public Object lock;
 
     public void AITurn() {
+        lock = new Object();
         map.cursorSpr.setVisible(false);
         newTurnAllUnits();
+        Thread ts[] = new Thread[aiUnits.length];
         for (int i = 0; i < aiUnits.length; i++) {
             if (aiUnits[i] != null && aiUnits[i].getHealth() > 0) {
-                map.setActiveView(aiUnits[i].getX(), aiUnits[i].getY());
-                ((AIUnit) aiUnits[i]).live(map, this);
-                //aiUnits[i].endTurn(map.lManager);
                 try {
-                    Thread.sleep(100);
+                    ((AIUnit) aiUnits[i]).setMap(map);
+                    Thread t = new Thread(((AIUnit) aiUnits[i]));
+                    ts[i] = t;
+                    t.join();
+
+
+
+                    //                ((AIUnit) aiUnits[i]).live(map, this);
+                    //                aiUnits[i].endTurn(map.lManager);
+//                    try {
+//                        Thread.sleep(100);
+//                    } catch (InterruptedException ex) {
+//                        ex.printStackTrace();
+//                    }
                 } catch (InterruptedException ex) {
                     ex.printStackTrace();
                 }
+            }
+        }
+        for (int i = 0; i < ts.length; i++) {
+            if (ts[i] != null) {
+                synchronized (this) {
+                    synchronized (map.lManager) {
+                        ts[i].start();
+                    }
+                }
+            }
+            try {
+                Thread.sleep(100);
+            } catch (InterruptedException ex) {
+                ex.printStackTrace();
             }
         }
         playerTurn = true;
@@ -121,6 +151,11 @@ public class GameHandler implements Runnable {
             }
 //            }
         }
+        Form highscoreForm = ((GameMIDlet) map.mainMidlet).getMainForm().highscoreForm;
+        if (highscoreForm == null) {
+            highscoreForm = new HighscoreForm(((GameMIDlet) map.mainMidlet).getmDisplay(), map, highscore);
+        }
+        ((GameMIDlet) map.mainMidlet).getmDisplay().setCurrent(highscoreForm);
     }
 
     public void start() {

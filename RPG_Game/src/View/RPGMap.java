@@ -63,9 +63,9 @@ public class RPGMap extends GameCanvas implements Runnable, CommandListener {
     private LinkedList path, openList, closedList;
     private String statusStr;
     public Thread keyThread;
-    GameHandler game;
+    public GameHandler game;
     Command cmdMenu, cmdExit;
-    MIDlet mainMidlet;
+    public MIDlet mainMidlet;
 
     public void loadImages() throws IOException {
         images = new Image[21];
@@ -148,13 +148,13 @@ public class RPGMap extends GameCanvas implements Runnable, CommandListener {
     }
 
     public void createAIUnits() {
-        ai_units[0] = new AIUnit(11, 5, images[14], images[3], 5, new CavalryAttack(images[5], this));
+        ai_units[0] = new AIUnit(3, 4, images[14], images[3], 5, new CavalryAttack(images[5], this));
         // ai_units[0] = new AIUnit(10, 2, images[14],images[3], 5, new CavalryAttack(images[5], this));
         ai_units[1] = new AIUnit(10, 3, images[14], images[3], 5, new CavalryAttack(images[5], this));
         ai_units[2] = new AIUnit(11, 2, images[14], images[3], 5, new CavalryAttack(images[5], this));
         ai_units[3] = new AIUnit(11, 3, images[14], images[3], 5, new CavalryAttack(images[5], this));
         ai_units[4] = new AIUnit(11, 0, images[14], images[3], 5, new CavalryAttack(images[5], this));
-        ai_units[5] = new AIUnit(3, 4, images[14], images[3], 5, new CavalryAttack(images[5], this));
+        ai_units[5] = new AIUnit(11, 5, images[14], images[3], 5, new CavalryAttack(images[5], this));
         ai_units[6] = new AIUnit(12, 0, images[12], images[3], 3, new RangedAttack(images[6], this));
         ai_units[7] = new AIUnit(12, 5, images[12], images[3], 3, new RangedAttack(images[6], this));
         ai_units[8] = new AIUnit(13, 2, images[12], images[3], 3, new RangedAttack(images[6], this));
@@ -174,7 +174,7 @@ public class RPGMap extends GameCanvas implements Runnable, CommandListener {
         ai_units[22] = new AIUnit(22, 12, images[13], images[3], 4, new KnightAttack(images[4], this));
         for (int i = 0; i < ai_units.length; i++) {
             if (ai_units[i] != null) {
-                lManager.append(ai_units[i].getSprite());
+                lManager.append(ai_units[i].getSprite());                
             }
         }
     }

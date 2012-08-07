@@ -18,7 +18,8 @@ public class AStar {
     protected LinkedList constructPath(Node node) {
         LinkedList path = new LinkedList();
 
-        while (node.getParent() != null) {
+        //while (node.getParent() != null) {
+        while (node != null) {
             path.addFirst(node);
             node = node.getParent();
         }
@@ -50,7 +51,7 @@ public class AStar {
 
     public LinkedList findPath(Node start, Node goalNode) {
         this.start = start;
-        this.goal = new Node(new Cell(goalNode.data.getX(),goalNode.data.getY()));
+        this.goal = new Node(new Cell(goalNode.data.getX(), goalNode.data.getY()));
         start.setParent(null);
         start.estimatedCostToGoal = start.getEstimatedCostTo(goal);
         start.costFromStart = 0;
@@ -88,7 +89,6 @@ public class AStar {
         }
         return null;
     }
-
 //    protected LinkedList startSearch(Node start, Node goal) {
 //        start.setParent(null);
 //        start.estimatedCostToGoal = start.getEstimatedCostTo(goal);

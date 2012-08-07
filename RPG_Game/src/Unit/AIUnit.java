@@ -54,6 +54,7 @@ public class AIUnit extends UnitAbstract implements Runnable {
                             if (path != null && !path.isEmpty()) {
                                 break;
                             }
+                            
                             reset(nodes);
                             open.clear();
                             close.clear();
@@ -61,7 +62,7 @@ public class AIUnit extends UnitAbstract implements Runnable {
                         }
 
                         if (path != null && !path.isEmpty()) {
-                            path.print();
+                            //path.print();
                             this.move(map, path);
                             getAttackType().attack(this, nearUnit[i]);
                             getAttackType().start();
